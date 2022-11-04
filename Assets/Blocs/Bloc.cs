@@ -6,6 +6,7 @@ public class Bloc : MonoBehaviour
 {
     public Arrastrador Clicker;
     public string Funcio;
+    public bool colocat = false;
     Collider2D Collider;
     Collider2D Canvas;
     // Start is called before the first frame update
@@ -19,24 +20,24 @@ public class Bloc : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Clicker.selectedObject && Clicker.selectedObject!=this.gameObject){
-            // ContactFilter2D c = new ContactFilter2D();
-            // c.minDepth = 0;
-            // c.maxDepth = 90;
-            // Collider2D[] res = new Collider2D[1];
-            // Collider.OverlapCollider(c,res);
-            // List<Collider2D> cols = new List<Collider2D>(res);
-            // if(cols.IndexOf(Clicker.selectedBloc.Collider)!=-1){
-            //     Debug.Log("esta per sobre"+name);
-            // }
-        }else if(!Clicker.selectedObject){
-            Collider2D[] res = new Collider2D[1];
-            Collider.OverlapCollider(new ContactFilter2D(),res);
-            List<Collider2D> cols = new List<Collider2D>(res);
-            if(cols.IndexOf(Canvas)<0){
+        if(colocat && Clicker.selectedObject && Clicker.selectedObject==this.gameObject){
+            colocat = false;
+        }else if(!colocat && !Clicker.selectedObject){
+            if(!Canvas.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition))){
                 Destroy(this.gameObject);
             }
-            
+            // else{
+            //     Collider2D[] res = new Collider2D[1];
+            //     ContactFilter2D c = new ContactFilter2D();
+            //     Collider.OverlapCollider(c,res);
+            //     List<Collider2D> cols = new List<Collider2D>(res);
+            //     Debug.Log(cols[0]);
+            //     if(cols.IndexOf(Canvas)<0){
+            //         Destroy(this.gameObject);
+            //     }
+
+            // }
+            colocat = true;
         }
     }
 }
