@@ -16,6 +16,7 @@ public class Generador : MonoBehaviour
     void Start()
     {
         Clicker = FindObjectOfType<Arrastrador>();
+        
     }
 
     // Update is called once per frame

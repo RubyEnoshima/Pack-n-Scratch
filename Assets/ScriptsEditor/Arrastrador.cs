@@ -40,7 +40,7 @@ public class Arrastrador : MonoBehaviour
             if(results.Length!=0){
                 Collider2D highestCollider = GetHighestObject(results);
                 selectedObject = highestCollider.transform.gameObject;
-                if(selectedObject.name != "Canvas"){
+                if(selectedObject.name != "Editor"){
                     selectedBloc = selectedObject.GetComponent<Bloc>();
                     offset = selectedObject.transform.position - mousePosition;
 

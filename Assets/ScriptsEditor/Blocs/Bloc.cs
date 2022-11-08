@@ -5,16 +5,23 @@ using UnityEngine;
 public class Bloc : MonoBehaviour
 {
     public Arrastrador Clicker;
+    
     public string Funcio;
     public bool colocat = false;
     Collider2D Collider;
-    Collider2D Canvas;
+    Collider2D EditorCol;
+    Editor Editor;
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         Clicker = FindObjectOfType<Arrastrador>();
         Collider = GetComponent<Collider2D>();
-        Canvas = GameObject.Find("Canvas").GetComponent<Collider2D>();
+        EditorCol = GameObject.Find("Editor").GetComponent<Collider2D>();
+        Editor = GameObject.Find("Editor").GetComponent<Editor>();
+    }
+
+    public virtual void Executar(){
+
     }
 
     // Update is called once per frame
@@ -23,7 +30,7 @@ public class Bloc : MonoBehaviour
         if(colocat && Clicker.selectedObject && Clicker.selectedObject==this.gameObject){
             colocat = false;
         }else if(!colocat && !Clicker.selectedObject){
-            if(!Canvas.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition))){
+            if(!EditorCol.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition))){
                 Destroy(this.gameObject);
             }
             // else{
@@ -32,12 +39,13 @@ public class Bloc : MonoBehaviour
             //     Collider.OverlapCollider(c,res);
             //     List<Collider2D> cols = new List<Collider2D>(res);
             //     Debug.Log(cols[0]);
-            //     if(cols.IndexOf(Canvas)<0){
+            //     if(cols.IndexOf(Editor)<0){
             //         Destroy(this.gameObject);
             //     }
 
             // }
             colocat = true;
+            Editor.AfegirBloc(this);
         }
     }
 }
