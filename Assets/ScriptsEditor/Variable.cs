@@ -2,23 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Variable : MonoBehaviour
+public abstract class Variable : MonoBehaviour
 {
-    int tipus;
-    int contingut;
-    string contingutText;
-
-    
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    public enum TIPUSVAR{
+        NOMBRE = 0,
+        STRING = 1,
+        BOOL = 2
     }
+    protected int tipus;
+    public string nom;
+    public bool inicialitzat = false;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public abstract dynamic Get<T>();
+    public abstract void Crear(string _nom, dynamic _contingut);
+    public abstract void Modificar(dynamic _contingut);
 }

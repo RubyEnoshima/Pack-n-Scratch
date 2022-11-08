@@ -12,7 +12,7 @@ public class BlocOperacio : Bloc
 
     public float A = 0;
     public float B = 0;
-    public string Operacio = "+";
+    public string Operacio;
     public float Resultat = 0;
 
     // Excepcions
@@ -52,6 +52,7 @@ public class BlocOperacio : Bloc
     protected override void Start(){
         base.Start();
         Funcio = "Operar";
+        Operacio = "+";
     }
 
     public override void Executar()

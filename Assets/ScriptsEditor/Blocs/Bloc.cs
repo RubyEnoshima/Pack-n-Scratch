@@ -1,16 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Bloc : MonoBehaviour
 {
     public Arrastrador Clicker;
-    
+    public Text Label;
+
     public string Funcio;
     public bool colocat = false;
+    protected int nBloc = 0;
+
     Collider2D Collider;
     Collider2D EditorCol;
     Editor Editor;
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
@@ -22,6 +27,11 @@ public class Bloc : MonoBehaviour
 
     public virtual void Executar(){
 
+    }
+
+    public void CanviarNombre(int n){
+        nBloc = n;
+        Label.text = "#"+nBloc.ToString();
     }
 
     // Update is called once per frame

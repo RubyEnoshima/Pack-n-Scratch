@@ -6,11 +6,18 @@ public class Editor : MonoBehaviour
 {
     GameObject Blocs;
     Pantalla Pantalla;
-    
-    public void AfegirBloc(Bloc bloc){
-        
-        bloc.transform.parent = Blocs.transform;
+    public List<Variable> Variables;
+    public int MaxVariables = 10;
 
+    public void AfegirVariable(Variable variable){
+        if(Variables.Count<MaxVariables){
+            Variables.Add(variable);
+        }
+    }
+
+    public void AfegirBloc(Bloc bloc){
+        bloc.transform.parent = Blocs.transform;
+        bloc.CanviarNombre(Blocs.transform.childCount);
     }
 
     public void Compilar(){
