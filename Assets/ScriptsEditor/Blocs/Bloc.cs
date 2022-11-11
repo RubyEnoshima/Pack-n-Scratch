@@ -8,13 +8,16 @@ public class Bloc : MonoBehaviour
     public Arrastrador Clicker;
     public Text Label;
 
+    public Dropdown Variables = null;
+    public Dropdown Blocs = null;
+
     public string Funcio;
     public bool colocat = false;
-    protected int nBloc = 0;
+    public int nBloc = -1;
 
     Collider2D Collider;
     Collider2D EditorCol;
-    Editor Editor;
+    protected Editor Editor;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -23,15 +26,52 @@ public class Bloc : MonoBehaviour
         Collider = GetComponent<Collider2D>();
         EditorCol = GameObject.Find("Editor").GetComponent<Collider2D>();
         Editor = GameObject.Find("Editor").GetComponent<Editor>();
+        
     }
 
     public virtual void Executar(){
 
     }
 
+    // Actualitzem la llista de variables
+    public virtual void ActualitzarVariables(){
+        if(Variables){
+            Variables.ClearOptions();
+            List<Dropdown.OptionData> llista = Editor.DropVariables();
+            List<Dropdown.OptionData> res = new List<Dropdown.OptionData>();
+            int i = 0;
+            foreach(var variable in llista){
+                if(Editor.Variables[i].BlocIni >= nBloc)
+                    break;
+
+                res.Add(variable);
+                i++;
+            }
+            Variables.AddOptions(res);
+        }
+    }
+
+    // Actualitzem la llista de blocs
+    public virtual void ActualitzarBloc(){
+        if(Blocs){
+            Blocs.ClearOptions();
+            List<Dropdown.OptionData> llista = Editor.DropBlocs();
+            Blocs.AddOptions(llista.GetRange(0,nBloc-1));
+            if(Blocs.options.Count==0) Blocs.ClearOptions();
+        }
+    }
+
     public void CanviarNombre(int n){
         nBloc = n;
         Label.text = "#"+nBloc.ToString();
+    }
+
+    protected virtual void OnDestroy() {
+        Editor.TreureBloc(this);
+    }
+
+    public virtual dynamic ResultatBloc(){
+        return null;
     }
 
     // Update is called once per frame
@@ -55,7 +95,12 @@ public class Bloc : MonoBehaviour
 
             // }
             colocat = true;
-            Editor.AfegirBloc(this);
+            if(nBloc==-1){
+                Editor.AfegirBloc(this);
+                ActualitzarBloc();
+                ActualitzarVariables();
+            }
+            
         }
     }
 }

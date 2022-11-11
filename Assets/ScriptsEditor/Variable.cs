@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Variable : MonoBehaviour
+public abstract class Variable
 {
     public enum TIPUSVAR{
         NOMBRE = 0,
@@ -12,8 +12,9 @@ public abstract class Variable : MonoBehaviour
     protected int tipus;
     public string nom;
     public bool inicialitzat = false;
+    public int BlocIni = -1;
 
-    public abstract dynamic Get<T>();
-    public abstract void Crear(string _nom, dynamic _contingut);
+    public abstract dynamic Get();
+    public abstract void Crear(string _nom, dynamic _contingut, int bloc);
     public abstract void Modificar(dynamic _contingut);
 }

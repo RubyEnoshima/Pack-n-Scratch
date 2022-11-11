@@ -89,4 +89,8 @@ public class BlocOperacio : Bloc
         
         Debug.Log(Resultat);
     }
+
+    public override dynamic ResultatBloc(){
+        return Resultat;
+    }
 }

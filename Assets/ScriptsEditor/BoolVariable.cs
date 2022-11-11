@@ -6,13 +6,14 @@ public class BoolVariable : Variable
 {
     bool contingut;
 
-    public override dynamic Get<T>(){
+    public override dynamic Get(){
         return contingut;
     }
 
-    public override void Crear(string _nom, dynamic _contingut){
+    public override void Crear(string _nom, dynamic _contingut, int bloc){
         nom = _nom;
-        Modificar((bool)_contingut);
+        BlocIni = bloc;
+        Modificar(_contingut);
     }
 
     public override void Modificar(dynamic _contingut){

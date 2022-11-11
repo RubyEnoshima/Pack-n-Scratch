@@ -1402,7 +1402,7 @@ Transform:
   m_GameObject: {fileID: 6131473520586753585}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6.76, y: 0.13, z: 0}
-  m_LocalScale: {x: 3.5926, y: 1.4321, z: 1}
+  m_LocalScale: {x: 4.5, y: 2, z: 1}
   m_Children:
   - {fileID: 4806725728800066876}
   m_Father: {fileID: 0}
@@ -1499,8 +1499,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Clicker: {fileID: 0}
   Label: {fileID: 5220160529082601144}
+  Variables: {fileID: 0}
+  Blocs: {fileID: 0}
   Funcio: 
   colocat: 0
+  nBloc: -1
   InputA: {fileID: 1572511640166893352}
   InputB: {fileID: 6741002069273229815}
   DropOperacio: {fileID: 5985086028540081257}

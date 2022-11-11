@@ -6,19 +6,20 @@ public class StringVariable : Variable
 {
     string contingut;
 
-    public override dynamic Get<T>(){
+    public override dynamic Get(){
         return contingut;
     }
 
-    public override void Crear(string _nom, dynamic _contingut){
+    public override void Crear(string _nom, dynamic _contingut, int bloc){
         nom = _nom;
-        Modificar((string)_contingut);
+        BlocIni = bloc;
+        Modificar(_contingut);
         
     }
 
     public override void Modificar(dynamic _contingut){
         if(_contingut is string){
-            contingut = (string)_contingut;
+            contingut = _contingut;
             inicialitzat = true;
         }
     }
