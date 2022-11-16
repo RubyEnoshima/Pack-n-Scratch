@@ -17,4 +17,5 @@ public abstract class Variable
     public abstract dynamic Get();
     public abstract void Crear(string _nom, dynamic _contingut, int bloc);
     public abstract void Modificar(dynamic _contingut);
+    public abstract Variable Copiar();
 }

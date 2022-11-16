@@ -29,4 +29,11 @@ public class BoolVariable : Variable
         tipus = (int)TIPUSVAR.BOOL;
         contingut = false;
     }
+
+    public override Variable Copiar()
+    {
+        BoolVariable copia = new BoolVariable();
+        copia.Crear(nom,contingut,BlocIni);
+        return copia;
+    }
 }

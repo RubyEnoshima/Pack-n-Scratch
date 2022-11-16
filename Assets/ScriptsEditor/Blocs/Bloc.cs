@@ -14,9 +14,10 @@ public class Bloc : MonoBehaviour
     public string Funcio;
     public bool colocat = false;
     public int nBloc = -1;
+    public int VariableValor = -1;
 
-    Collider2D Collider;
-    Collider2D EditorCol;
+    protected Collider2D Collider;
+    protected Collider2D EditorCol;
     protected Editor Editor;
 
     // Start is called before the first frame update
@@ -26,11 +27,16 @@ public class Bloc : MonoBehaviour
         Collider = GetComponent<Collider2D>();
         EditorCol = GameObject.Find("Editor").GetComponent<Collider2D>();
         Editor = GameObject.Find("Editor").GetComponent<Editor>();
-        
+        if(Variables)
+            Variables.onValueChanged.AddListener(delegate {CanviarVariableNum();});
     }
 
     public virtual void Executar(){
 
+    }
+
+    public virtual void CanviarVariableNum(){
+        VariableValor = Variables.value;
     }
 
     // Actualitzem la llista de variables
@@ -48,6 +54,8 @@ public class Bloc : MonoBehaviour
                 i++;
             }
             Variables.AddOptions(res);
+            Variables.value = VariableValor;
+            
         }
     }
 

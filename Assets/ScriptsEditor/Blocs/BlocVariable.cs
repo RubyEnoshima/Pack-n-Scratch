@@ -7,16 +7,18 @@ public class BlocVariable : Bloc
     public Dropdown Tipus;
     public InputField NomVariable;
     public InputField ContingutVariable;
-    Variable v;
-    int nVariable = -1;
+    protected Variable v;
+    public int nVariable = -1;
 
     protected override void Start(){
         base.Start();
         Funcio = "Variable";
         v = new FloatVariable();
-        v.Crear("",0,nBloc);
         nVariable = Editor.AfegirVariable(v);
+        v.Crear("",0,nVariable);
     }
+
+    
 
     public void CanviarContingut(){
         v.Modificar(ContingutVariable.text);
@@ -28,7 +30,7 @@ public class BlocVariable : Bloc
         Editor.ModificarVariable(nVariable,v);
     }
 
-    public void CanviarTipus(){
+    public virtual void CanviarTipus(){
         if(Tipus.value==0){
             v = new FloatVariable();
             CanviarContingut();
@@ -41,6 +43,7 @@ public class BlocVariable : Bloc
             FerVisible(1);
             // CanviarContingutBloc();
         }else{
+            ActualitzarVariables();
             FerVisible(2);
         }
 
@@ -55,7 +58,6 @@ public class BlocVariable : Bloc
             dynamic res = Editor.ResultatBloc(i-1);
             if(res is float){
                 v = new FloatVariable();
-                Debug.Log("resultat: "+res);
             }else if(res is string){
                 v = new StringVariable();
             }else if(res is bool){
@@ -64,10 +66,14 @@ public class BlocVariable : Bloc
             CanviarNom();
             v.Modificar(res);
             Editor.ModificarVariable(nVariable,v);
+        }else{
+            v = new FloatVariable();
+            CanviarNom();
+            v.Modificar("");
         }
     }
 
-    void FerVisible(int n){
+    protected void FerVisible(int n){
         if(n==0){
             ContingutVariable.gameObject.SetActive(true);
         }else if(n==1){
@@ -79,11 +85,19 @@ public class BlocVariable : Bloc
         }
     }
 
+    public virtual void CanviarContingutVariable(){
+        v = Editor.Variables[Variables.value].Copiar();
+        v.BlocIni = nVariable;
+        CanviarNom();
+    } 
+
     public override void Executar()
     {
         base.Executar();
         if(Tipus.value==2){
             CanviarContingutBloc();
+        }else if(Tipus.value==3){
+            CanviarContingutVariable();
         }
     }
 

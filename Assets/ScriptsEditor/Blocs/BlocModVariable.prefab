@@ -278,8 +278,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -110.1, y: 48.100002}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: -50.54, y: 48.100002}
+  m_SizeDelta: {x: 279.12, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2130022120486085162
 CanvasRenderer:
@@ -322,7 +322,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: VARIABLE
+  m_Text: MODIFICAR VARIABLE
 --- !u!1 &1727322550678908206
 GameObject:
   m_ObjectHideFlags: 0
@@ -431,7 +431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6338472609295152023
 RectTransform:
   m_ObjectHideFlags: 0
@@ -446,11 +446,11 @@ RectTransform:
   - {fileID: 3595097073231269922}
   - {fileID: 7480738187963936383}
   m_Father: {fileID: 4806725728800066876}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 113.2, y: -50.299995}
+  m_AnchoredPosition: {x: 113.2, y: -37.9}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6200394407055709368
@@ -1142,7 +1142,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3709114277494460681
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1157,11 +1157,11 @@ RectTransform:
   - {fileID: 7247951658791786074}
   - {fileID: 8828100021182447467}
   m_Father: {fileID: 4806725728800066876}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 113.2, y: -50.299995}
+  m_AnchoredPosition: {x: 113.2, y: -38.4}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &213604191808670047
@@ -2450,15 +2450,25 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Text
       m_Image: {fileID: 0}
-    - m_Text: "Expressi\xF3 booleana"
-      m_Image: {fileID: 0}
     - m_Text: Resultat d'un bloc
       m_Image: {fileID: 0}
     - m_Text: Variable
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 828005434090571235}
+        m_TargetAssemblyTypeName: BlocVariable, Assembly-CSharp
+        m_MethodName: CanviarTipus
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!1 &4519218930549137071
 GameObject:
@@ -2849,8 +2859,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6131473520586753586}
   - component: {fileID: 6131473520586753587}
+  - component: {fileID: 828005434090571235}
   - component: {fileID: 6131473520586753584}
-  - component: {fileID: 7523995405754969604}
   m_Layer: 0
   m_Name: BlocModVariable
   m_TagString: Bloc
@@ -2924,6 +2934,31 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &828005434090571235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6131473520586753585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e65b0a1aa17abf4fb0cbd36459190b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Clicker: {fileID: 0}
+  Label: {fileID: 4142827274361154970}
+  Variables: {fileID: 2424417542552476787}
+  Blocs: {fileID: 4523364027952497064}
+  Funcio: 
+  colocat: 0
+  nBloc: -1
+  VariableValor: -1
+  Tipus: {fileID: 4067261869346497204}
+  NomVariable: {fileID: 0}
+  ContingutVariable: {fileID: 2617365506486764064}
+  nVariable: -1
+  VariablesInput: {fileID: 2868161352981724120}
 --- !u!61 &6131473520586753584
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2950,28 +2985,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &7523995405754969604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6131473520586753585}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b463518936819944cacf52a76f3c88f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Clicker: {fileID: 0}
-  Label: {fileID: 4142827274361154970}
-  Variables: {fileID: 2424417542552476787}
-  Blocs: {fileID: 0}
-  Funcio: 
-  colocat: 0
-  nBloc: -1
-  Tipus: {fileID: 4067261869346497204}
-  NomVariable: {fileID: 0}
-  ContingutVariable: {fileID: 2617365506486764064}
 --- !u!1 &6197542152781031671
 GameObject:
   m_ObjectHideFlags: 0
@@ -3159,7 +3172,7 @@ RectTransform:
   - {fileID: 6690182292612957408}
   - {fileID: 8819628325907941506}
   m_Father: {fileID: 4806725728800066876}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3522,7 +3535,19 @@ MonoBehaviour:
     m_Options: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 828005434090571235}
+        m_TargetAssemblyTypeName: BlocModVariable, Assembly-CSharp
+        m_MethodName: CanviarVariable
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!1 &6929024011321331243
 GameObject:
@@ -4023,9 +4048,9 @@ RectTransform:
   - {fileID: 7290734638496411356}
   - {fileID: 5761110166753848791}
   - {fileID: 4081614564450840645}
-  - {fileID: 5426632329755369459}
   - {fileID: 6338472609295152023}
   - {fileID: 3709114277494460681}
+  - {fileID: 5426632329755369459}
   m_Father: {fileID: 6131473520586753586}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

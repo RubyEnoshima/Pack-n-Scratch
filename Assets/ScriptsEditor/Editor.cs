@@ -79,6 +79,14 @@ public class Editor : MonoBehaviour
         }
     }
 
+    public void CarregarScript(){
+
+    }
+
+    public bool EsCorrecte(){
+        return true;
+    }
+
     // Start is called before the first frame update
     void Start()
     {

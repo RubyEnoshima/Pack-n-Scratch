@@ -30,4 +30,11 @@ public class StringVariable : Variable
         tipus = (int)TIPUSVAR.STRING;
         contingut = "";
     }
+
+    public override Variable Copiar()
+    {
+        StringVariable copia = new StringVariable();
+        copia.Crear(nom,contingut,BlocIni);
+        return copia;
+    }
 }

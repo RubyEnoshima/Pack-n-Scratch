@@ -21,18 +21,20 @@ public class FloatVariable : Variable
     public override void Modificar(dynamic _contingut){
         if(_contingut is float || _contingut is int){
             Debug.Log("S'ha tractat de posar aixo: "+contingut);
-            try{
-                contingut = float.Parse(_contingut);
-
-            }catch(Exception e){
-                
-                MalFormatejat = true;
-                contingut = float.PositiveInfinity;
-            }
+            contingut = (_contingut);
+            
             inicialitzat = true;
         }else{
-            contingut = float.PositiveInfinity;
-            inicialitzat = false;
+            try{
+                contingut = float.Parse(_contingut);
+                inicialitzat = true;
+
+            }catch(Exception e){
+                Debug.Log(e);
+                MalFormatejat = true;
+                contingut = float.PositiveInfinity;
+                inicialitzat = false;
+            }
         }
     }
 
@@ -41,5 +43,12 @@ public class FloatVariable : Variable
     {
         tipus = (int)TIPUSVAR.NOMBRE;
         contingut = 0;
+    }
+
+    public override Variable Copiar()
+    {
+        FloatVariable copia = new FloatVariable();
+        copia.Crear(nom,contingut,BlocIni);
+        return copia;
     }
 }
