@@ -11,14 +11,4 @@ public class Pantalla : MonoBehaviour
     public void CanviarText(string s){
         text.text = s;
     }
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

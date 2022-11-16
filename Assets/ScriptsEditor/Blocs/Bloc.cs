@@ -81,15 +81,13 @@ public class Bloc : MonoBehaviour
         if(Blocs){
             Blocs.ClearOptions();
             
+            List<Dropdown.OptionData> llista = Editor.DropBlocs();
+            Blocs.AddOptions(llista.GetRange(0,nBloc-1));
+            Blocs.value = BlocValor;
             if(Blocs.options.Count==0){
                 Blocs.value = 0;
             }
-            else{
-                List<Dropdown.OptionData> llista = Editor.DropBlocs();
-                Blocs.AddOptions(llista.GetRange(0,nBloc-1));
-                Blocs.value = BlocValor;
 
-            }
         }
     }
 
@@ -110,7 +108,7 @@ public class Bloc : MonoBehaviour
     void Update()
     {
         if(colocat && Clicker.selectedObject && Clicker.selectedObject==this.gameObject){
-            transform.parent = null;
+            //transform.parent = null;
             colocat = false;
 
             if(Slot){

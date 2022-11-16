@@ -18,6 +18,14 @@ public class Editor : MonoBehaviour
     public List<bool> Ple;
     public int nPagina = 0;
 
+    public string ResultatEsperat = "";
+    public int nScripts = 0;
+    public int nIncorrectes = 0;
+    public int nCorrectes = 0;
+
+    public Cafeina CafeinaScr;
+    public int Cafeina = 5;
+
     public Collider2D ObtSlot(Vector3 posicioRatoli){
         if(Slot1.OverlapPoint(posicioRatoli)) return Slot1;
         else if(Slot2.OverlapPoint(posicioRatoli)) return Slot2;
@@ -85,8 +93,8 @@ public class Editor : MonoBehaviour
                 while(aux>=0 && !Ple[aux]) aux--;
                 aux++;
                 Ple[aux] = true;
-                Debug.Log("ME voy al slot "+aux);
                 GameObject SlotDefinitiu = GameObject.Find("Slot"+(aux+1).ToString());
+
                 // Afegir el bloc
                 bloc.transform.position = SlotDefinitiu.transform.position;
                 bloc.Slot = SlotDefinitiu;
@@ -103,27 +111,6 @@ public class Editor : MonoBehaviour
         }else{
             Destroy(bloc.gameObject);
         }
-
-
-
-        // MIERDA PURA
-
-        // List<Transform> fills = new List<Transform>();
-        // foreach(Transform fill in Blocs.transform){
-        //     fills.Add(fill);
-        //     fill.parent = null;
-        // }
-        // fills.Add(bloc.transform);
-        // Debug.Log(fills.Count);
-        // fills.Sort((Transform t1, Transform t2) => {return t2.position.y==t1.position.y ? t2.position.x.CompareTo(t1.position.x) : t2.position.y.CompareTo(t1.position.y);});
-        // int i=1;
-        // foreach(Transform fill in fills){
-        //     fill.name = i.ToString();
-        //     Debug.Log(fill.name);
-        //     fill.GetComponent<Bloc>().CanviarNombre(i);
-        //     fill.parent = Blocs.transform;
-        //     i++;
-        // }
     }
 
     public void TreureSlot(GameObject Slot){
@@ -131,9 +118,24 @@ public class Editor : MonoBehaviour
         Ple[ultimChar] = false;
     }
 
+    // Puja un slot el bloc si es pot
+    public void PujarSlot(Bloc bloc){
+        GameObject Slot = bloc.Slot;
+        int ultimChar = (Slot.name[Slot.name.Length-1] - '0')-1;
+        if(ultimChar==0 || Ple[ultimChar-1]) return;
+
+        Ple[ultimChar] = false;
+        Ple[ultimChar-1] = true;
+        GameObject SlotFinal = GameObject.Find("Slot"+ultimChar);
+        bloc.transform.position = SlotFinal.transform.position;
+        bloc.Slot = SlotFinal;
+    }
+
     public void TreureBloc(Bloc bloc){
         int n = 1;
+        GameObject Slot = bloc.Slot;
         foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>()){
+            PujarSlot(b);
             b.CanviarNombre(n);
             b.ActualitzarBloc();
             b.ActualitzarVariables();
@@ -145,6 +147,23 @@ public class Editor : MonoBehaviour
         foreach(Transform bloc in Blocs.transform){
             bloc.GetComponent<Bloc>().Executar();
         }
+        if(EsCorrecte()){
+            nScripts++;
+            Cafeina++;
+        }else{
+            nIncorrectes++;
+            Cafeina--;
+        }
+        CafeinaScr.ActualitzarCafeina(Cafeina);
+        // Mostrar gag
+    }
+
+    public float CalcularMitjana(){
+        return (nIncorrectes+nCorrectes)/nScripts;
+    }
+
+    public void UtilitzarCafeina(){
+
     }
 
     public void CarregarScript(){
@@ -152,7 +171,7 @@ public class Editor : MonoBehaviour
     }
 
     public bool EsCorrecte(){
-        return true;
+        return Pantalla.text.text == ResultatEsperat;
     }
 
     // Start is called before the first frame update
