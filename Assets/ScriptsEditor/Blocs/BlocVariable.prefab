@@ -2438,9 +2438,14 @@ MonoBehaviour:
   Funcio: 
   colocat: 0
   nBloc: -1
+  VariableValor: -1
+  BlocValor: -1
+  Canvas: {fileID: 5018299455889617123}
+  Sprite: {fileID: 0}
   Tipus: {fileID: 4067261869346497204}
   NomVariable: {fileID: 4884724027104931592}
   ContingutVariable: {fileID: 2617365506486764064}
+  nVariable: -1
 --- !u!1 &6197542152781031671
 GameObject:
   m_ObjectHideFlags: 0

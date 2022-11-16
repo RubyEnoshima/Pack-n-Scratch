@@ -2954,11 +2954,15 @@ MonoBehaviour:
   colocat: 0
   nBloc: -1
   VariableValor: -1
+  BlocValor: -1
+  Canvas: {fileID: 5018299455889617123}
+  Sprite: {fileID: 6131473520586753587}
   Tipus: {fileID: 4067261869346497204}
   NomVariable: {fileID: 0}
   ContingutVariable: {fileID: 2617365506486764064}
   nVariable: -1
   VariablesInput: {fileID: 2868161352981724120}
+  DiferentTipus: 0
 --- !u!61 &6131473520586753584
 BoxCollider2D:
   m_ObjectHideFlags: 0

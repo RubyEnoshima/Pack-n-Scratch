@@ -13,9 +13,39 @@ public class BlocBoolea : Bloc
     public InputField ContingutDreta;
     public Dropdown VariablesDreta;
     public Dropdown BlocsDreta;
+    public int BlocsDretaValor;
+    public int VariablesDretaValor;
     public Dropdown Comparador;
 
     bool resultat;
+
+    protected override void Start(){
+        base.Start();
+        Funcio = "Boolea";
+        BlocsDreta.onValueChanged.AddListener(delegate {CanviarBlocsNum();});
+        VariablesDreta.onValueChanged.AddListener(delegate {CanviarVarNum();});
+    }
+
+    void CanviarBlocsNum(){
+        BlocsDretaValor = BlocsDreta.value;
+    }
+    void CanviarVarNum(){
+        VariablesDretaValor = VariablesDreta.value;
+    }
+
+    public override void ActualitzarBloc(){
+        base.ActualitzarBloc();
+        BlocsDreta.ClearOptions();
+        BlocsDreta.AddOptions(Blocs.options);
+        BlocsDreta.value = BlocsDretaValor;
+    }
+
+    public override void ActualitzarVariables(){
+        base.ActualitzarVariables();
+        VariablesDreta.ClearOptions();
+        VariablesDreta.AddOptions(Variables.options);
+        VariablesDreta.value = VariablesDretaValor;
+    }
 
     void FerVisible(int n, bool dreta){
         if(!dreta){
@@ -120,6 +150,31 @@ public class BlocBoolea : Bloc
     {
         base.Executar();
         dynamic esq = ObtEsquerra(), dre = ObtDreta();
+
+        if(esq is string && dre is float){
+            dre = dre.ToString();
+        }else if(esq is float && dre is string){
+            esq = esq.ToString();
+        }
+        
+        if(esq is string && dre is string){
+            int res = string.Compare(esq,dre);
+            if(Comparador.value==0){
+                resultat = res == 0;
+            }else if(Comparador.value==1){
+                resultat = res != 0;
+            }else if(Comparador.value==2){
+                resultat = res >= 0;
+            }else if(Comparador.value==3){
+                resultat = res <= 0;
+            }else if(Comparador.value==4){
+                resultat = res > 0;
+            }else{
+                resultat = res < 0;
+            }
+            return;
+        }
+
         if(Comparador.value==0){
             resultat = esq == dre;
         }else if(Comparador.value==1){

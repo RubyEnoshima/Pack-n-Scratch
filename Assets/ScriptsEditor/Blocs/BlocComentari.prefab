@@ -453,7 +453,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 3
   m_Sprite: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
   m_Color: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 1}
   m_FlipX: 0
@@ -503,13 +503,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc324714174ec54198c59ddae838c85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Clicker: {fileID: 0}
   Label: {fileID: 7300936783981909477}
   Variables: {fileID: 0}
   Blocs: {fileID: 0}
   Funcio: 
   colocat: 0
   nBloc: -1
+  VariableValor: -1
+  BlocValor: -1
+  Canvas: {fileID: 5018299455889617123}
+  Sprite: {fileID: 0}
 --- !u!1 &7515390006707447636
 GameObject:
   m_ObjectHideFlags: 0

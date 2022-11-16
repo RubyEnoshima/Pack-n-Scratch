@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Bloc : MonoBehaviour
 {
-    public Arrastrador Clicker;
+    public static Arrastrador Clicker;
     public Text Label;
 
     public Dropdown Variables = null;
@@ -15,10 +15,16 @@ public class Bloc : MonoBehaviour
     public bool colocat = false;
     public int nBloc = -1;
     public int VariableValor = -1;
+    public int BlocValor = -1;
 
     protected Collider2D Collider;
-    protected Collider2D EditorCol;
-    protected Editor Editor;
+    protected static Collider2D EditorCol;
+    protected static Editor Editor;
+
+    public Canvas Canvas;
+    public SpriteRenderer Sprite;
+
+    public GameObject Slot = null;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -27,8 +33,12 @@ public class Bloc : MonoBehaviour
         Collider = GetComponent<Collider2D>();
         EditorCol = GameObject.Find("Editor").GetComponent<Collider2D>();
         Editor = GameObject.Find("Editor").GetComponent<Editor>();
+        Sprite = transform.gameObject.GetComponent<SpriteRenderer>();
+
         if(Variables)
             Variables.onValueChanged.AddListener(delegate {CanviarVariableNum();});
+        if(Blocs)
+            Blocs.onValueChanged.AddListener(delegate {CanviarBlocNum();});
     }
 
     public virtual void Executar(){
@@ -37,6 +47,10 @@ public class Bloc : MonoBehaviour
 
     public virtual void CanviarVariableNum(){
         VariableValor = Variables.value;
+    }
+
+    public virtual void CanviarBlocNum(){
+        BlocValor = Blocs.value;
     }
 
     // Actualitzem la llista de variables
@@ -54,7 +68,10 @@ public class Bloc : MonoBehaviour
                 i++;
             }
             Variables.AddOptions(res);
-            Variables.value = VariableValor;
+            if(Variables.options.Count!=0)
+                Variables.value = VariableValor;
+            else
+                Variables.value = 0;
             
         }
     }
@@ -63,9 +80,16 @@ public class Bloc : MonoBehaviour
     public virtual void ActualitzarBloc(){
         if(Blocs){
             Blocs.ClearOptions();
-            List<Dropdown.OptionData> llista = Editor.DropBlocs();
-            Blocs.AddOptions(llista.GetRange(0,nBloc-1));
-            if(Blocs.options.Count==0) Blocs.ClearOptions();
+            
+            if(Blocs.options.Count==0){
+                Blocs.value = 0;
+            }
+            else{
+                List<Dropdown.OptionData> llista = Editor.DropBlocs();
+                Blocs.AddOptions(llista.GetRange(0,nBloc-1));
+                Blocs.value = BlocValor;
+
+            }
         }
     }
 
@@ -86,28 +110,29 @@ public class Bloc : MonoBehaviour
     void Update()
     {
         if(colocat && Clicker.selectedObject && Clicker.selectedObject==this.gameObject){
+            transform.parent = null;
             colocat = false;
+
+            if(Slot){
+                Editor.TreureSlot(Slot);
+                Slot = null;
+            }
         }else if(!colocat && !Clicker.selectedObject){
-            if(!EditorCol.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition))){
+            Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            // No és a sobre de l'editor en sí
+            if(!EditorCol.OverlapPoint(pos)){
                 Destroy(this.gameObject);
             }
-            // else{
-            //     Collider2D[] res = new Collider2D[1];
-            //     ContactFilter2D c = new ContactFilter2D();
-            //     Collider.OverlapCollider(c,res);
-            //     List<Collider2D> cols = new List<Collider2D>(res);
-            //     Debug.Log(cols[0]);
-            //     if(cols.IndexOf(Editor)<0){
-            //         Destroy(this.gameObject);
-            //     }
 
-            // }
+            GameObject slot = Editor.ObtSlot(pos).gameObject;
+            
+
             colocat = true;
-            if(nBloc==-1){
-                Editor.AfegirBloc(this);
-                ActualitzarBloc();
-                ActualitzarVariables();
-            }
+            
+            Editor.AfegirBloc(this,slot);
+            ActualitzarBloc();
+            ActualitzarVariables();
             
         }
     }

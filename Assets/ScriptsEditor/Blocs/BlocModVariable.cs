@@ -36,6 +36,7 @@ public class BlocModVariable : BlocVariable
     public override void ActualitzarVariables()
     {
         base.ActualitzarVariables();
+        VariablesInput.ClearOptions();
         VariablesInput.AddOptions(Variables.options);
         VariablesInput.value = VariableValorInput;
     }

@@ -1504,6 +1504,10 @@ MonoBehaviour:
   Funcio: 
   colocat: 0
   nBloc: -1
+  VariableValor: -1
+  BlocValor: -1
+  Canvas: {fileID: 5018299455889617123}
+  Sprite: {fileID: 0}
   InputA: {fileID: 1572511640166893352}
   InputB: {fileID: 6741002069273229815}
   DropOperacio: {fileID: 5985086028540081257}

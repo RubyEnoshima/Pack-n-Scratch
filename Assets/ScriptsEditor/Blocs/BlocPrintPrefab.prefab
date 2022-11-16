@@ -2487,6 +2487,10 @@ MonoBehaviour:
   Funcio: 
   colocat: 0
   nBloc: -1
+  VariableValor: -1
+  BlocValor: -1
+  Canvas: {fileID: 5018299455889617123}
+  Sprite: {fileID: 0}
   input: {fileID: 0}
   Pantalla: {fileID: 0}
   TextMostrat: 
