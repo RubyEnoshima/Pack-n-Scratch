@@ -23,7 +23,8 @@ public class BlocPrint : Bloc
     bool BlocValid(Bloc bloc){
         return bloc.nBloc != nBloc;
     }
-
+    // Soy la marrana de las campurrianas
+    
     public override void Executar()
     {
         base.Executar();
@@ -37,9 +38,8 @@ public class BlocPrint : Bloc
             else TextMostrat = "";
         }
         else{
-            if(Editor.Blocs.transform.childCount != 0 && BlocValid(Editor.Blocs.transform.GetChild(Blocs.value).GetComponent<Bloc>())){
-                TextMostrat = Editor.Blocs.transform.GetChild(Blocs.value).GetComponent<Bloc>().ResultatBloc().ToString();
-            }else TextMostrat = "";
+            int i = int.Parse(Blocs.options[Blocs.value].text.Remove(0,1));
+            TextMostrat = Editor.ResultatBloc(i-1).ToString();
         }
         Debug.Log("Mostrant "+TextMostrat);
         Pantalla.CanviarText(TextMostrat);

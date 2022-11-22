@@ -104,33 +104,46 @@ public class Bloc : MonoBehaviour
         return null;
     }
 
+    public void EliminarEditor(){
+        if(Slot){
+            Editor.TreureSlot(Slot);
+            Slot = null;
+        }
+
+        Destroy(this.gameObject);
+    }
+
     // Update is called once per frame
     void Update()
     {
         if(colocat && Clicker.selectedObject && Clicker.selectedObject==this.gameObject){
             //transform.parent = null;
             colocat = false;
-
-            if(Slot){
-                Editor.TreureSlot(Slot);
-                Slot = null;
-            }
         }else if(!colocat && !Clicker.selectedObject){
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
             // No és a sobre de l'editor en sí
             if(!EditorCol.OverlapPoint(pos)){
-                Destroy(this.gameObject);
+                EliminarEditor();
             }
 
             GameObject slot = Editor.ObtSlot(pos).gameObject;
             
+            if(!slot.name.StartsWith("Slot")){
+                EliminarEditor();
+            }
 
-            colocat = true;
-            
-            Editor.AfegirBloc(this,slot);
-            ActualitzarBloc();
-            ActualitzarVariables();
+            if(!Slot || Slot && Slot!=slot){
+                colocat = true;
+                
+                Editor.AfegirBloc(this,slot);
+                ActualitzarBloc();
+                ActualitzarVariables();
+
+            }else if(Slot && Slot==slot){
+                colocat = true;
+                transform.position = slot.transform.position;
+            }
             
         }
     }

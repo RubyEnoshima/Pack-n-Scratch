@@ -15,8 +15,11 @@ public class Editor : MonoBehaviour
     public Collider2D Slot3;
     public Collider2D Slot4;
 
-    public List<bool> Ple;
-    public int nPagina = 0;
+    public List<bool> Ple; // True si el slot i és ple
+    public int paginaAct = 0; // Pàgina actual
+    public int nPagines = 1; // Pàgina actual
+    public GameObject PagSeg;
+    public GameObject PagAnt;
 
     public string ResultatEsperat = "";
     public int nScripts = 0;
@@ -34,8 +37,62 @@ public class Editor : MonoBehaviour
         else return GetComponent<Collider2D>();
     }
 
+    public void PaginaAnterior(){
+        Blocs.transform.GetChild(paginaAct).gameObject.SetActive(false);
+
+        paginaAct--;
+        if(paginaAct<0) paginaAct = nPagines-1;
+
+        Blocs.transform.GetChild(paginaAct).gameObject.SetActive(true);
+
+        bool[] aux = {false,false,false,false};
+        Ple = new List<bool>(aux);
+        for(int i=0;i<Blocs.transform.GetChild(paginaAct).childCount;i++){
+            Ple[i] = true;
+        }
+
+    }
+
+    public void PaginaSeguent(){
+        Blocs.transform.GetChild(paginaAct).gameObject.SetActive(false);
+
+        paginaAct++;
+        if(paginaAct>=nPagines) paginaAct = 0;
+
+        Blocs.transform.GetChild(paginaAct).gameObject.SetActive(true);
+
+        bool[] aux = {false,false,false,false};
+        Ple = new List<bool>(aux);
+        for(int i=0;i<Blocs.transform.GetChild(paginaAct).childCount;i++){
+            Ple[i] = true;
+        }
+    }
+
+    public void AfegirPagina(){
+        GameObject novaPagina = new GameObject(nPagines.ToString());
+        novaPagina.transform.parent = Blocs.transform;
+        novaPagina.SetActive(false);
+        nPagines++;
+        if(nPagines>1){
+            PagSeg.SetActive(true);
+            PagAnt.SetActive(true);
+        }
+    }
+
+    public void TreurePagina(){
+        nPagines--;
+        Blocs.transform.GetChild(nPagines).parent = null;
+        if(nPagines<=1){
+            PagSeg.SetActive(false);
+            PagAnt.SetActive(false);
+        }
+    }
+
     public dynamic ResultatBloc(int i){
-        return Blocs.transform.GetChild(i).GetComponent<Bloc>().ResultatBloc();
+        if(i>=0 && i<Blocs.GetComponentsInChildren<Bloc>(true).Length)
+            return Blocs.GetComponentsInChildren<Bloc>(true)[i].ResultatBloc();
+
+        return null;
     }
 
     public int AfegirVariable(Variable variable){
@@ -76,12 +133,17 @@ public class Editor : MonoBehaviour
     // Retorna una llista d'OptionData pels dropdowns amb el numero dels blocs 
     public List<Dropdown.OptionData> DropBlocs(){
         List<Dropdown.OptionData> llista = new List<Dropdown.OptionData>();
-        foreach(Bloc bloc in Blocs.GetComponentsInChildren<Bloc>()){
+        foreach(Bloc bloc in Blocs.GetComponentsInChildren<Bloc>(true)){
             llista.Add(new Dropdown.OptionData("#"+bloc.nBloc.ToString()));
         }
         return llista;
     }
 
+    public void AfegirBlocPagina(Bloc bloc, int pag){
+        Transform pagina = Blocs.transform.GetChild(pag);
+        if(pagina.childCount<4)
+            bloc.transform.parent = pagina;
+    }
 
     public void AfegirBloc(Bloc bloc, GameObject Slot){
         char ultimChar = Slot.name[Slot.name.Length-1];
@@ -98,11 +160,17 @@ public class Editor : MonoBehaviour
                 // Afegir el bloc
                 bloc.transform.position = SlotDefinitiu.transform.position;
                 bloc.Slot = SlotDefinitiu;
-                bloc.CanviarNombre(aux+1+nPagina);
-                bloc.transform.parent = Blocs.transform;
-                foreach(Bloc fill in Blocs.GetComponentsInChildren<Bloc>()){
+                bloc.CanviarNombre(aux+1+paginaAct*4);
+                AfegirBlocPagina(bloc,paginaAct);
+                foreach(Bloc fill in Blocs.GetComponentsInChildren<Bloc>(true)){
                     fill.ActualitzarBloc();
                 }
+                
+                // Afegim una pàgina si és necessari
+                if(Blocs.transform.GetChild(paginaAct).childCount==4){
+                    AfegirPagina();
+                }
+
             }else{
                 Destroy(bloc.gameObject);
 
@@ -110,6 +178,22 @@ public class Editor : MonoBehaviour
 
         }else{
             Destroy(bloc.gameObject);
+        }
+    }
+
+    public void TreureBloc(Bloc bloc){
+        int n = 1;
+        GameObject Slot = bloc.Slot;
+        foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>()){
+            PujarSlot(b);
+            b.CanviarNombre(n);
+            b.ActualitzarBloc();
+            b.ActualitzarVariables();
+            n++;
+        }
+
+        if(Blocs.transform.GetChild(paginaAct).childCount==4){
+            TreurePagina();
         }
     }
 
@@ -131,21 +215,14 @@ public class Editor : MonoBehaviour
         bloc.Slot = SlotFinal;
     }
 
-    public void TreureBloc(Bloc bloc){
-        int n = 1;
-        GameObject Slot = bloc.Slot;
-        foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>()){
-            PujarSlot(b);
-            b.CanviarNombre(n);
-            b.ActualitzarBloc();
-            b.ActualitzarVariables();
-            n++;
-        }
-    }
+    
 
     public void Compilar(){
-        foreach(Transform bloc in Blocs.transform){
-            bloc.GetComponent<Bloc>().Executar();
+        foreach(Transform pagina in Blocs.transform){
+            foreach(Transform bloc in pagina){
+                bloc.GetComponent<Bloc>().Executar();
+
+            }
         }
         if(EsCorrecte()){
             nScripts++;
@@ -171,7 +248,7 @@ public class Editor : MonoBehaviour
     }
 
     public bool EsCorrecte(){
-        return Pantalla.text.text == ResultatEsperat;
+        return true;//Pantalla.text.text == ResultatEsperat;
     }
 
     // Start is called before the first frame update

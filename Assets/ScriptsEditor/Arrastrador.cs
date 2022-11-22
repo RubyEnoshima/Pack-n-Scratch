@@ -7,6 +7,7 @@ public class Arrastrador : MonoBehaviour
     public GameObject selectedObject;
     public Bloc selectedBloc;
     Vector3 offset;
+    Vector3 lastPos;
 
     Collider2D GetHighestObject(Collider2D[] results)
     {
@@ -35,22 +36,27 @@ public class Arrastrador : MonoBehaviour
     void Update()
     {
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouseDelta = Input.mousePosition - lastPos;
         if (Input.GetMouseButtonDown(0))
         {
-            Collider2D[] results = Physics2D.OverlapPointAll(mousePosition);
-            if(results.Length!=0){
-                Collider2D highestCollider = GetHighestObject(results);
-                selectedObject = highestCollider.transform.gameObject;
-                if(selectedObject.tag == "Bloc" || selectedObject.tag == "Generador"){
-                    selectedBloc = selectedObject.GetComponent<Bloc>();
-                    offset = selectedObject.transform.position - mousePosition;
+            if(Vector3.Distance(Input.mousePosition,lastPos)>=0.075f){
+                Collider2D[] results = Physics2D.OverlapPointAll(mousePosition);
+                if(results.Length!=0){
+                    Collider2D highestCollider = GetHighestObject(results);
+                    selectedObject = highestCollider.transform.gameObject;
+                    if(selectedObject.tag == "Bloc" || selectedObject.tag == "Generador"){
+                        selectedBloc = selectedObject.GetComponent<Bloc>();
+                        offset = selectedObject.transform.position - mousePosition;
 
-                }else{
-                    selectedObject = null;
+                    }else{
+                        selectedObject = null;
 
-                } 
+                    } 
+
+                }
 
             }
+            lastPos = Input.mousePosition;
         }
         if (selectedObject)
         {
