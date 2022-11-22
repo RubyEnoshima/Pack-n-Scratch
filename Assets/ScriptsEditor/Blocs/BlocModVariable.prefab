@@ -255,7 +255,7 @@ GameObject:
   - component: {fileID: 7290734638496411356}
   - component: {fileID: 2130022120486085162}
   - component: {fileID: 4994481616105484522}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2021,7 +2021,7 @@ GameObject:
   - component: {fileID: 7894925704945574983}
   - component: {fileID: 2894922998132787810}
   - component: {fileID: 1541968991941288407}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Fletxa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2946,7 +2946,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e65b0a1aa17abf4fb0cbd36459190b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Clicker: {fileID: 0}
   Label: {fileID: 4142827274361154970}
   Variables: {fileID: 2424417542552476787}
   Blocs: {fileID: 4523364027952497064}
@@ -2957,6 +2956,7 @@ MonoBehaviour:
   BlocValor: -1
   Canvas: {fileID: 5018299455889617123}
   Sprite: {fileID: 6131473520586753587}
+  Slot: {fileID: 0}
   Tipus: {fileID: 4067261869346497204}
   NomVariable: {fileID: 0}
   ContingutVariable: {fileID: 2617365506486764064}
@@ -3075,7 +3075,7 @@ GameObject:
   - component: {fileID: 7411080644176661669}
   - component: {fileID: 5515238640535390881}
   - component: {fileID: 4142827274361154970}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}

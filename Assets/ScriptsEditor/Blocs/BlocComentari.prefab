@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 205714360300467827}
   - component: {fileID: 239470772905318215}
   - component: {fileID: 7300936783981909477}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 8506034195919204565}
   - component: {fileID: 7290645761877382092}
   - component: {fileID: 5314631806209858765}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -513,6 +513,7 @@ MonoBehaviour:
   BlocValor: -1
   Canvas: {fileID: 5018299455889617123}
   Sprite: {fileID: 0}
+  Slot: {fileID: 0}
 --- !u!1 &7515390006707447636
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class Bloc : MonoBehaviour
 {
+    
     public static Arrastrador Clicker;
     public Text Label;
 
@@ -112,6 +114,9 @@ public class Bloc : MonoBehaviour
 
         Destroy(this.gameObject);
     }
+
+    
+ 
 
     // Update is called once per frame
     void Update()

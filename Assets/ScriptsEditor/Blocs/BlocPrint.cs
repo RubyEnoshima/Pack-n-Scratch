@@ -23,7 +23,6 @@ public class BlocPrint : Bloc
     bool BlocValid(Bloc bloc){
         return bloc.nBloc != nBloc;
     }
-    // Soy la marrana de las campurrianas
     
     public override void Executar()
     {

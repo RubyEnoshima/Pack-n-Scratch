@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.EventSystems;
 public class Arrastrador : MonoBehaviour
 {
+    int UILayer;
     public GameObject selectedObject;
     public Bloc selectedBloc;
     Vector3 offset;
@@ -29,7 +30,35 @@ public class Arrastrador : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        UILayer = LayerMask.NameToLayer("UI");
+    }
+
+    //Returns 'true' if we touched or hovering on Unity UI element.
+    public bool IsPointerOverUIElement()
+    {
+        return IsPointerOverUIElement(GetEventSystemRaycastResults());
+    }
+
+    private bool IsPointerOverUIElement(List<RaycastResult> eventSystemRaysastResults)
+    {
+        for (int index = 0; index < eventSystemRaysastResults.Count; index++)
+        {
+            RaycastResult curRaysastResult = eventSystemRaysastResults[index];
+            if (curRaysastResult.gameObject.layer == UILayer)
+                return true;
+        }
+        return false;
+    }
+ 
+ 
+    //Gets all event system raycast results of current mouse or touch position.
+    static List<RaycastResult> GetEventSystemRaycastResults()
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = Input.mousePosition;
+        List<RaycastResult> raysastResults = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, raysastResults);
+        return raysastResults;
     }
 
     // Update is called once per frame
@@ -39,7 +68,7 @@ public class Arrastrador : MonoBehaviour
         Vector3 mouseDelta = Input.mousePosition - lastPos;
         if (Input.GetMouseButtonDown(0))
         {
-            if(Vector3.Distance(Input.mousePosition,lastPos)>=0.075f){
+            if(Vector3.Distance(Input.mousePosition,lastPos)>=0.075f && !IsPointerOverUIElement() ){
                 Collider2D[] results = Physics2D.OverlapPointAll(mousePosition);
                 if(results.Length!=0){
                     Collider2D highestCollider = GetHighestObject(results);

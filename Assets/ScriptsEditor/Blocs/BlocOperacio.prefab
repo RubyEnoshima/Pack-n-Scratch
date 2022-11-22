@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7290734638496411356}
   - component: {fileID: 2130022120486085162}
   - component: {fileID: 4994481616105484522}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1306,7 +1306,7 @@ GameObject:
   - component: {fileID: 8630915561259904958}
   - component: {fileID: 7400896494911870873}
   - component: {fileID: 5220160529082601144}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1497,7 +1497,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1cde9c909b9b024ebc3744d36aff976, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Clicker: {fileID: 0}
   Label: {fileID: 5220160529082601144}
   Variables: {fileID: 0}
   Blocs: {fileID: 0}
@@ -1508,6 +1507,7 @@ MonoBehaviour:
   BlocValor: -1
   Canvas: {fileID: 5018299455889617123}
   Sprite: {fileID: 0}
+  Slot: {fileID: 0}
   InputA: {fileID: 1572511640166893352}
   InputB: {fileID: 6741002069273229815}
   DropOperacio: {fileID: 5985086028540081257}
