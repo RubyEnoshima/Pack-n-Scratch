@@ -15,6 +15,7 @@ public class Bloc : MonoBehaviour
 
     public string Funcio;
     public bool colocat = false;
+    bool enEditor = false;
     public int nBloc = -1;
     public int VariableValor = -1;
     public int BlocValor = -1;
@@ -80,7 +81,7 @@ public class Bloc : MonoBehaviour
 
     // Actualitzem la llista de blocs
     public virtual void ActualitzarBloc(){
-        if(Blocs){
+        if(Blocs && Slot){
             Blocs.ClearOptions();
             
             List<Dropdown.OptionData> llista = Editor.DropBlocs();
@@ -99,7 +100,7 @@ public class Bloc : MonoBehaviour
     }
 
     protected virtual void OnDestroy() {
-        Editor.TreureBloc(this);
+        if(enEditor) Editor.TreureBloc(this);
     }
 
     public virtual dynamic ResultatBloc(){
@@ -140,6 +141,13 @@ public class Bloc : MonoBehaviour
 
             if(!Slot || Slot && Slot!=slot){
                 colocat = true;
+                enEditor = true;
+
+                if(Slot){
+                    Editor.TreureSlot(Slot);
+                    Editor.TreureBloc(this);
+                    Slot = null;
+                }
                 
                 Editor.AfegirBloc(this,slot);
                 ActualitzarBloc();

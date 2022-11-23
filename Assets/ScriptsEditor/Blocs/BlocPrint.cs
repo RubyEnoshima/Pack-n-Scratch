@@ -31,7 +31,6 @@ public class BlocPrint : Bloc
             TextMostrat = input.text;
         else if(TextVarBloc==2){
             if(Editor.Variables.Count != 0){
-                Debug.Log(Editor.Variables[Variables.value].nom);
                 TextMostrat = Editor.Variables[Variables.value].Get().ToString();  
             }
             else TextMostrat = "";

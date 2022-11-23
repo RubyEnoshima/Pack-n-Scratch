@@ -10,6 +10,8 @@ public class Editor : MonoBehaviour
     public List<Variable> Variables;
     public int MaxVariables = 10;
 
+    public dynamic Input = 10;
+
     public Collider2D Slot1;
     public Collider2D Slot2;
     public Collider2D Slot3;
@@ -28,6 +30,8 @@ public class Editor : MonoBehaviour
 
     public Cafeina CafeinaScr;
     public int Cafeina = 5;
+
+    public string Departament = "Departament1";
 
     public Collider2D ObtSlot(Vector3 posicioRatoli){
         if(Slot1.OverlapPoint(posicioRatoli)) return Slot1;
@@ -104,7 +108,7 @@ public class Editor : MonoBehaviour
     }
 
     public void ModificarVariable(int i, Variable variable){
-        if(i>=0 && i<Variables.Count){
+        if(i>0 && i<Variables.Count){
             Variables[i] = variable;
             foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>()){
                 b.ActualitzarVariables();
@@ -113,7 +117,7 @@ public class Editor : MonoBehaviour
     }
 
     public void EsborrarVariable(int i){
-        if(i>=0 && i<Variables.Count){
+        if(i>0 && i<Variables.Count){
             Variables.RemoveAt(i);
             foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>()){
                 b.ActualitzarVariables();
@@ -184,11 +188,14 @@ public class Editor : MonoBehaviour
     public void TreureBloc(Bloc bloc){
         int n = 1;
         GameObject Slot = bloc.Slot;
-        foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>()){
+        foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>(true)){
+            if(b==bloc) continue;
+
             PujarSlot(b);
             b.CanviarNombre(n);
             b.ActualitzarBloc();
             b.ActualitzarVariables();
+
             n++;
         }
 
@@ -200,19 +207,34 @@ public class Editor : MonoBehaviour
     public void TreureSlot(GameObject Slot){
         int ultimChar = (Slot.name[Slot.name.Length-1] - '0')-1;
         Ple[ultimChar] = false;
+        
     }
 
     // Puja un slot el bloc si es pot
     public void PujarSlot(Bloc bloc){
         GameObject Slot = bloc.Slot;
+        if(Slot==null) return;
         int ultimChar = (Slot.name[Slot.name.Length-1] - '0')-1;
-        if(ultimChar==0 || Ple[ultimChar-1]) return;
+        if(ultimChar==0 && bloc.nBloc==1 || ultimChar!=0 && Ple[ultimChar-1]) return;
 
-        Ple[ultimChar] = false;
-        Ple[ultimChar-1] = true;
-        GameObject SlotFinal = GameObject.Find("Slot"+ultimChar);
+        GameObject SlotFinal;
+        if(ultimChar==0 && bloc.nBloc>=4){ // Si es troba en una pagina >1 i al slot 1
+            int paginaNova = bloc.nBloc/4 - 1;
+            Debug.Log(paginaNova); 
+            bloc.transform.parent = Blocs.transform.GetChild(paginaNova);
+            // if(Blocs.transform.GetChild(paginaNova+1).childCount==0) TreurePagina();
+            SlotFinal = Slot4.gameObject;
+            Ple[3] = true;
+        }else{
+            Ple[ultimChar] = false;
+            Ple[ultimChar-1] = true;
+            SlotFinal = GameObject.Find("Slot"+ultimChar);
+
+        }
+
         bloc.transform.position = SlotFinal.transform.position;
         bloc.Slot = SlotFinal;
+        bloc.nBloc--;
     }
 
     
@@ -226,10 +248,10 @@ public class Editor : MonoBehaviour
         }
         if(EsCorrecte()){
             nScripts++;
-            Cafeina++;
+            if(Cafeina<10) Cafeina++;
         }else{
             nIncorrectes++;
-            Cafeina--;
+            if(Cafeina>0) Cafeina--;
         }
         CafeinaScr.ActualitzarCafeina(Cafeina);
         // Mostrar gag
@@ -240,11 +262,39 @@ public class Editor : MonoBehaviour
     }
 
     public void UtilitzarCafeina(){
+        if(Cafeina>=3){
+            Cafeina -= 3;
+            CafeinaScr.ActualitzarCafeina(Cafeina);
+            Debug.Log("L'script semblava correcte!");
 
+        }
     }
 
-    public void CarregarScript(){
+    public void CarregarScript(string scriptNom){
+        GameObject scriptPrefab = (GameObject)Resources.Load("Scripts/"+Departament+"/"+scriptNom, typeof(GameObject));
+        Destroy(Blocs);
+        GameObject script = Instantiate(scriptPrefab);
+        script.name = "Blocs";
+        script.transform.parent = transform;
+        Blocs = script;
+        bool[] aux = {false,false,false,false};
+        int i = 0, j = 1;
+        foreach(Bloc fill in script.GetComponentsInChildren<Bloc>(true)){
+            aux[i] = true;
+            if(i<4) i++;
 
+            GameObject slot = GameObject.Find("Slot"+(j).ToString());
+            
+            AfegirBloc(fill,slot);
+            fill.ActualitzarBloc();
+            fill.ActualitzarVariables();
+            j++;
+            if(j>4) j=1;
+
+        }
+        Ple = new List<bool>(aux);
+
+        
     }
 
     public bool EsCorrecte(){
@@ -256,8 +306,12 @@ public class Editor : MonoBehaviour
     {
         Blocs = transform.Find("Blocs").gameObject;
         Variables = new List<Variable>();
+        FloatVariable input = new FloatVariable();
+        input.Crear("Input",Input,0);
+        Variables.Add(input);
         bool[] aux = {false,false,false,false};
         Ple = new List<bool>(aux);
+        //CarregarScript("Script1");
     }
 
     // Update is called once per frame

@@ -94,7 +94,9 @@ public class BlocVariable : Bloc
     public override void Executar()
     {
         base.Executar();
-        if(Tipus.value==2){
+        if(Tipus.value==0 || Tipus.value==1){
+            CanviarContingut();
+        }else if(Tipus.value==2){
             CanviarContingutBloc();
         }else if(Tipus.value==3){
             CanviarContingutVariable();
@@ -102,6 +104,7 @@ public class BlocVariable : Bloc
     }
 
     protected override void OnDestroy() {
+        base.OnDestroy();
         Editor.EsborrarVariable(nVariable);
     }
 }

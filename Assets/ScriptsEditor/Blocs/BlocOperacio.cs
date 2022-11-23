@@ -9,6 +9,9 @@ public class BlocOperacio : Bloc
     public InputField InputA;
     public InputField InputB;
     public Dropdown DropOperacio;
+    public Dropdown VariablesB;
+    public Dropdown TipusA;
+    public Dropdown TipusB;
 
     public float A = 0;
     public float B = 0;
@@ -18,10 +21,27 @@ public class BlocOperacio : Bloc
     // Excepcions
     public bool DividintZero = false;
     public bool MalFormatejat = false;
+
+    int VariableValorB;
+    bool tipusA = false;
+    bool tipusB = false;
+
+    public override void ActualitzarVariables()
+    {
+        base.ActualitzarVariables();
+        VariablesB.ClearOptions();
+        VariablesB.AddOptions(Variables.options);
+        VariablesB.value = VariableValorB;
+    }
     
     public void CanviarA(){
         try{
-            A = float.Parse(InputA.text);
+            if(!tipusA){
+                A = float.Parse(InputA.text);
+
+            }else{
+                A = float.Parse(Editor.Variables[Variables.value].Get().ToString());
+            }
             MalFormatejat = false;
         }catch(Exception e){
             MalFormatejat = true;
@@ -30,10 +50,38 @@ public class BlocOperacio : Bloc
 
     public void CanviarB(){
         try{
-            B = float.Parse(InputB.text);
+            if(!tipusB){
+                B = float.Parse(InputB.text);
+
+            }else{
+                B = float.Parse(Editor.Variables[VariablesB.value].Get().ToString());
+            }
             MalFormatejat = false;
         }catch(Exception e){
             MalFormatejat = true;
+        }
+    }
+
+    public void CanviarTipusA(){
+        if(TipusA.value==0) {
+            tipusA = false;
+            InputA.gameObject.SetActive(true);
+
+        }else{
+            InputA.gameObject.SetActive(false);
+            tipusA = true;
+            ActualitzarVariables();
+        }
+    }
+
+    public void CanviarTipusB(){
+        if(TipusB.value==0) {
+            tipusB = false;
+            InputB.gameObject.SetActive(true);
+        }else{
+            InputB.gameObject.SetActive(false);
+            tipusB = true;
+            ActualitzarVariables();
         }
     }
 
@@ -53,6 +101,11 @@ public class BlocOperacio : Bloc
         base.Start();
         Funcio = "Operar";
         Operacio = "+";
+        VariablesB.onValueChanged.AddListener(delegate {CanviarVarNum();});
+    }
+
+    void CanviarVarNum(){
+        VariableValorB = VariablesB.value;
     }
 
     public override void Executar()
@@ -63,6 +116,9 @@ public class BlocOperacio : Bloc
             Resultat = float.PositiveInfinity;
             return;
         }
+
+        if(tipusA) CanviarA();
+        if(tipusB) CanviarB();
 
         switch(Operacio){
             case "+":

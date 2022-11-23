@@ -7,6 +7,7 @@ public class BlocModVariable : BlocVariable
     public Dropdown VariablesInput;
     int VariableValorInput;
     public bool DiferentTipus = false;
+    public bool UtilitzantInput = false;
 
     protected override void Start(){
         Clicker = FindObjectOfType<Arrastrador>();
@@ -19,14 +20,18 @@ public class BlocModVariable : BlocVariable
     }
 
     public void CanviarVariable(){
-        if(Editor.Variables.Count > 0)
-            v = Editor.Variables[VariablesInput.value];
+        if(Editor.Variables.Count > 0){
+            v = Editor.Variables[Variables.value];
+            nVariable = v.BlocIni;
+        }
     }
 
     public override void CanviarContingutVariable(){
+        string nom = v.nom;
         v = Editor.Variables[VariablesInput.value].Copiar();
         v.BlocIni = nVariable;
-        CanviarNom();
+        v.nom = nom;
+        Editor.ModificarVariable(Variables.value,v);
     } 
 
     void CanviarVariableInputNum(){
@@ -58,13 +63,17 @@ public class BlocModVariable : BlocVariable
 
     public override void Executar()
     {
-        base.Executar();
-        if(Tipus.value==0 && v is FloatVariable){
-            CanviarContingut();
-        }else if(Tipus.value==1 && v is StringVariable){
-            CanviarContingut();
-        }else{
-            DiferentTipus = true;
+        if(Variables.value==0) UtilitzantInput=true;
+        else{
+            base.Executar();
+            if(Tipus.value==0 && v is FloatVariable){
+                CanviarContingut();
+            }else if(Tipus.value==1 && v is StringVariable){
+                CanviarContingut();
+            }else if(Tipus.value!=2 && Tipus.value!=3){
+                DiferentTipus = true;
+            }
+
         }
 
 
