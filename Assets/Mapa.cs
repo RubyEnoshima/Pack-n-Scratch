@@ -5,7 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class Mapa : MonoBehaviour
 {
+    public GameObject DepartamentDesbloqueig;
+    
+
+    void Start(){
+        DepartamentDesbloqueig.SetActive(Global.estaDesbloquejat);
+    }
     public void EntrarDepartament(string Departament){
-        SceneManager.LoadScene("Oficina");
+        Global.Departament = Departament;
+        SceneManager.LoadScene("Editor");
     }
 }

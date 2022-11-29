@@ -19,6 +19,11 @@ public class BlocModVariable : BlocVariable
         VariablesInput.onValueChanged.AddListener(delegate {CanviarVariableInputNum();});
     }
 
+    public override bool TeErrors()
+    {
+        return DiferentTipus || UtilitzantInput;
+    }
+
     public void CanviarVariable(){
         if(Editor.Variables.Count > 0){
             v = Editor.Variables[Variables.value];

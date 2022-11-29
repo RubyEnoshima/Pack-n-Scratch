@@ -22,7 +22,7 @@ public class BlocOperacio : Bloc
     public bool DividintZero = false;
     public bool MalFormatejat = false;
 
-    int VariableValorB;
+    public int VariableValorB;
     bool tipusA = false;
     bool tipusB = false;
 
@@ -32,6 +32,21 @@ public class BlocOperacio : Bloc
         VariablesB.ClearOptions();
         VariablesB.AddOptions(Variables.options);
         VariablesB.value = VariableValorB;
+    }
+
+    public override bool TeErrors()
+    {
+        return DividintZero || MalFormatejat;
+    }
+
+    public override void Iniciar(){
+        base.Iniciar();
+        VariablesB.value = VariableValorB;
+        CanviarOperacio();
+        CanviarTipusA();
+        CanviarA();
+        CanviarTipusB();
+        CanviarB();
     }
     
     public void CanviarA(){
@@ -119,6 +134,8 @@ public class BlocOperacio : Bloc
 
         if(tipusA) CanviarA();
         if(tipusB) CanviarB();
+
+        CanviarOperacio();
 
         switch(Operacio){
             case "+":

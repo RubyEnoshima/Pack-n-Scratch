@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class Bloc : MonoBehaviour
 {
     
@@ -12,22 +11,25 @@ public class Bloc : MonoBehaviour
 
     public Dropdown Variables = null;
     public Dropdown Blocs = null;
+    public Pantalla Pantalla;
 
     public string Funcio;
     public bool colocat = false;
-    bool enEditor = false;
+    public bool enEditor = false;
     public int nBloc = -1;
     public int VariableValor = -1;
     public int BlocValor = -1;
 
     protected Collider2D Collider;
     protected static Collider2D EditorCol;
-    protected static Editor Editor;
+    public Editor Editor;
 
     public Canvas Canvas;
     public SpriteRenderer Sprite;
 
     public GameObject Slot = null;
+
+    protected bool iniciat = false;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -44,16 +46,31 @@ public class Bloc : MonoBehaviour
             Blocs.onValueChanged.AddListener(delegate {CanviarBlocNum();});
     }
 
+    public virtual bool TeErrors(){
+        return false;
+    }
+
     public virtual void Executar(){
 
     }
 
+    public virtual void Iniciar(){
+        ActualitzarBloc();
+        ActualitzarVariables();
+        CanviarBlocNum();
+        CanviarVariableNum();
+
+        iniciat = true;
+    }
+
     public virtual void CanviarVariableNum(){
-        VariableValor = Variables.value;
+        if(Variables)
+            VariableValor = Variables.value;
     }
 
     public virtual void CanviarBlocNum(){
-        BlocValor = Blocs.value;
+        if(Blocs)
+            BlocValor = Blocs.value;
     }
 
     // Actualitzem la llista de variables
@@ -81,7 +98,7 @@ public class Bloc : MonoBehaviour
 
     // Actualitzem la llista de blocs
     public virtual void ActualitzarBloc(){
-        if(Blocs && Slot){
+        if(Blocs && Slot && nBloc>1){
             Blocs.ClearOptions();
             
             List<Dropdown.OptionData> llista = Editor.DropBlocs();
@@ -104,7 +121,7 @@ public class Bloc : MonoBehaviour
     }
 
     public virtual dynamic ResultatBloc(){
-        return null;
+        return "";
     }
 
     public void EliminarEditor(){

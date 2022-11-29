@@ -9,16 +9,27 @@ public class BlocVariable : Bloc
     public InputField ContingutVariable;
     protected Variable v;
     public int nVariable = -1;
+    
 
     protected override void Start(){
         base.Start();
         Funcio = "Variable";
+        if(!iniciat){
+            v = new FloatVariable();
+            nVariable = Editor.AfegirVariable(v);
+            v.Crear("",0,nVariable);
+
+        }
+    }
+
+    public override void Iniciar()
+    {
+        base.Iniciar();
         v = new FloatVariable();
         nVariable = Editor.AfegirVariable(v);
         v.Crear("",0,nVariable);
+        CanviarTipus();
     }
-
-    
 
     public void CanviarContingut(){
         v.Modificar(ContingutVariable.text);

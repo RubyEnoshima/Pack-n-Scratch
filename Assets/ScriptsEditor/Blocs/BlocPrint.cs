@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class BlocPrint : Bloc
 {
     public InputField input;
-    public Pantalla Pantalla;
+    
     public string TextMostrat;
 
     public Dropdown TipusPrint;
@@ -16,8 +16,8 @@ public class BlocPrint : Bloc
         base.Start();
         Funcio = "Print";
         input = GetComponentInChildren<InputField>();
-        Pantalla = FindObjectOfType<Pantalla>();
-        
+        Pantalla = Editor.Pantalla;
+        TextVarBloc = TipusPrint.value;
     }
 
     bool BlocValid(Bloc bloc){

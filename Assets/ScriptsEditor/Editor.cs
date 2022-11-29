@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Editor : MonoBehaviour
 {
+    public GameObject MAIN;
     public GameObject Blocs;
-    Pantalla Pantalla;
+    public Pantalla Pantalla;
     public List<Variable> Variables;
     public int MaxVariables = 10;
 
     public dynamic Input = 10;
+    public Pantalla InputPantalla;
 
     public Collider2D Slot1;
     public Collider2D Slot2;
@@ -23,15 +26,40 @@ public class Editor : MonoBehaviour
     public GameObject PagSeg;
     public GameObject PagAnt;
 
-    public string ResultatEsperat = "";
+    public int TotalScripts = 1; // De moment
     public int nScripts = 0;
-    public int nIncorrectes = 0;
+    public float nIncorrectes = 0;
     public int nCorrectes = 0;
+    public int intents = 3;
 
     public Cafeina CafeinaScr;
     public int Cafeina = 5;
+    public Dia Dia;
+    public Notificacio Notificacio;
+    public Script ScriptActual;
+    public Arrastrador Arrastrador;
+    public void CanviarInput(Script s, int inputNum){
+        if(s.SonInputsNombres){
+            float inputVal = s.Inputs[inputNum];
+            InputPantalla.CanviarText(inputVal.ToString());
+            FloatVariable input = new FloatVariable();
+            input.Crear("Input",inputVal,0);
+            if(Variables.Count==0)
+                Variables.Add(input);
+            else
+                Variables[0] = input;
 
-    public string Departament = "Departament1";
+        }else{
+            string inputVal = s.InputsString[inputNum];
+            InputPantalla.CanviarText(inputVal);
+            StringVariable input = new StringVariable();
+            input.Crear("Input",inputVal,0);
+            if(Variables.Count==0)
+                Variables.Add(input);
+            else
+                Variables[0] = input;
+        }
+    }
 
     public Collider2D ObtSlot(Vector3 posicioRatoli){
         if(Slot1.OverlapPoint(posicioRatoli)) return Slot1;
@@ -85,7 +113,7 @@ public class Editor : MonoBehaviour
 
     public void TreurePagina(){
         nPagines--;
-        Blocs.transform.GetChild(nPagines).parent = null;
+        Destroy(Blocs.transform.GetChild(nPagines).gameObject);
         if(nPagines<=1){
             PagSeg.SetActive(false);
             PagAnt.SetActive(false);
@@ -220,7 +248,6 @@ public class Editor : MonoBehaviour
         GameObject SlotFinal;
         if(ultimChar==0 && bloc.nBloc>=4){ // Si es troba en una pagina >1 i al slot 1
             int paginaNova = bloc.nBloc/4 - 1;
-            Debug.Log(paginaNova); 
             bloc.transform.parent = Blocs.transform.GetChild(paginaNova);
             // if(Blocs.transform.GetChild(paginaNova+1).childCount==0) TreurePagina();
             SlotFinal = Slot4.gameObject;
@@ -237,68 +264,144 @@ public class Editor : MonoBehaviour
         bloc.nBloc--;
     }
 
-    
+    public void PostCompilar(){
+        TotalScripts--;
+        nScripts++;
+        if(TotalScripts==0){
+            Dia.AcabarDia(nCorrectes,(int)nIncorrectes,CalcularMitjana());
+            this.gameObject.SetActive(false);
+            Arrastrador.Actiu = false;
+        }
+        else{
+            Notificacio.CanviarNotis(TotalScripts);
+            // Agafar un script al atzar
+            CarregarScript("");
+            intents = 3;
+        }
+    }
 
-    public void Compilar(){
+    public IEnumerator ExecutarLent(){
         foreach(Transform pagina in Blocs.transform){
             foreach(Transform bloc in pagina){
                 bloc.GetComponent<Bloc>().Executar();
-
+                yield return new WaitForSeconds(0.5f);
             }
         }
+    }
+
+    public void ExecutarRapid(){
+        foreach(Transform pagina in Blocs.transform){
+            foreach(Transform bloc in pagina){
+                bloc.GetComponent<Bloc>().Executar();
+            }
+        }
+    }
+
+    public IEnumerator CompilarAux(){
+        yield return StartCoroutine(ExecutarLent());
+
         if(EsCorrecte()){
-            nScripts++;
+            nCorrectes++;
             if(Cafeina<10) Cafeina++;
+            if(ScriptActual.esDesbloqueig){
+                Global.estaDesbloquejat = true;
+            }
+            PostCompilar();
+            Debug.Log("Bien");
         }else{
-            nIncorrectes++;
-            if(Cafeina>0) Cafeina--;
+            CanviarInput(ScriptActual,0);
+            Debug.Log("Mal");
+            intents--;
+            nIncorrectes += 0.3f;
+            if(intents==0){
+                if(Cafeina>0) Cafeina--;
+                PostCompilar();
+            }
         }
         CafeinaScr.ActualitzarCafeina(Cafeina);
         // Mostrar gag
+        Arrastrador.Actiu = true;
+    }
+
+    public void Compilar(){
+        StartCoroutine(CompilarAux());
+        Arrastrador.Actiu = false;
     }
 
     public float CalcularMitjana(){
-        return (nIncorrectes+nCorrectes)/nScripts;
+        return 1-nIncorrectes/nScripts;
     }
 
     public void UtilitzarCafeina(){
         if(Cafeina>=3){
             Cafeina -= 3;
             CafeinaScr.ActualitzarCafeina(Cafeina);
-            Debug.Log("L'script semblava correcte!");
+            Debug.Log(ScriptActual.Inspiracio);
 
         }
     }
 
     public void CarregarScript(string scriptNom){
-        GameObject scriptPrefab = (GameObject)Resources.Load("Scripts/"+Departament+"/"+scriptNom, typeof(GameObject));
-        Destroy(Blocs);
+        GameObject scriptPrefab = (GameObject)Resources.Load("Scripts/"+Global.Departament+"/"+scriptNom, typeof(GameObject));
+        
         GameObject script = Instantiate(scriptPrefab);
-        script.name = "Blocs";
-        script.transform.parent = transform;
-        Blocs = script;
+
+        ScriptActual = script.GetComponent<Script>();
+        CanviarInput(ScriptActual,0);
+
+        bool[] aux1 = {false,false,false,false};
         bool[] aux = {false,false,false,false};
         int i = 0, j = 1;
         foreach(Bloc fill in script.GetComponentsInChildren<Bloc>(true)){
-            aux[i] = true;
-            if(i<4) i++;
+            fill.Editor = this;
+            fill.Pantalla = Pantalla;
+            fill.colocat = true;
+            fill.enEditor = true;
+            
+            if(i<4) {
+                aux[i] = true;
+                i++;
+            }
 
             GameObject slot = GameObject.Find("Slot"+(j).ToString());
             
             AfegirBloc(fill,slot);
-            fill.ActualitzarBloc();
-            fill.ActualitzarVariables();
+            fill.Iniciar();
             j++;
-            if(j>4) j=1;
+            if(j>4){
+                j=1;
+                PaginaSeguent();
+                Ple = new List<bool>(aux1);
+            }
 
         }
         Ple = new List<bool>(aux);
-
         
+        Notificacio.CarregarScript(ScriptActual);
+        Destroy(script);
+        PaginaSeguent();
     }
 
     public bool EsCorrecte(){
-        return true;//Pantalla.text.text == ResultatEsperat;
+        if(Pantalla.text.text == ScriptActual.ResultatsEsperats[0]){
+            CanviarInput(ScriptActual,1);
+            ExecutarRapid();
+            if(Pantalla.text.text == ScriptActual.ResultatsEsperats[1]){
+                CanviarInput(ScriptActual,2);
+                ExecutarRapid();
+                return Pantalla.text.text == ScriptActual.ResultatsEsperats[2];
+            }
+        }
+        return false;
+    }
+
+    public void Sortir(){
+        SceneManager.LoadScene("Mapa");
+    }
+    
+    public void Tancar(){
+        SceneManager.LoadScene("Oficina",LoadSceneMode.Additive);
+        MAIN.SetActive(false);
     }
 
     // Start is called before the first frame update
@@ -306,12 +409,16 @@ public class Editor : MonoBehaviour
     {
         Blocs = transform.Find("Blocs").gameObject;
         Variables = new List<Variable>();
-        FloatVariable input = new FloatVariable();
-        input.Crear("Input",Input,0);
-        Variables.Add(input);
+        
         bool[] aux = {false,false,false,false};
         Ple = new List<bool>(aux);
-        //CarregarScript("Script1");
+
+        // Agafar un al atzar
+        CarregarScript("Script2");
+        Notificacio.CanviarNotis(TotalScripts);
+        // ACORDARSE DE DESCOMENTAR!!!!!!!!!!!!!!!!!!!
+        /*SceneManager.sceneUnloaded += new UnityEngine.Events.UnityAction<Scene>(delegate {MAIN.SetActive(true);});
+        Tancar();*/
     }
 
     // Update is called once per frame

@@ -12,7 +12,6 @@ public class Cafeina : MonoBehaviour
     public Sprite ple;
     public Image img;
     public void ActualitzarCafeina(int Cafeina){
-        Debug.Log(Cafeina);
         if(Cafeina<=2) img.sprite = buit;
         else if(Cafeina==3 || Cafeina==4) img.sprite = migbuit;
         else if(Cafeina==5 || Cafeina==6) img.sprite = mig;

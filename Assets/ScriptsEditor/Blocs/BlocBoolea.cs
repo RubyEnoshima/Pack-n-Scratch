@@ -188,6 +188,7 @@ public class BlocBoolea : Bloc
         }else{
             resultat = esq < dre;
         }
+
     }
 
     public override dynamic ResultatBloc(){

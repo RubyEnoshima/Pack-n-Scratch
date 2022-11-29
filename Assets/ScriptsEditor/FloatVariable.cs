@@ -20,7 +20,6 @@ public class FloatVariable : Variable
 
     public override void Modificar(dynamic _contingut){
         if(_contingut is float || _contingut is int){
-            Debug.Log("S'ha tractat de posar aixo: "+contingut);
             contingut = (_contingut);
             
             inicialitzat = true;

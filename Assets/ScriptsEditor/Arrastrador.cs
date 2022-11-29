@@ -7,6 +7,7 @@ public class Arrastrador : MonoBehaviour
     int UILayer;
     public GameObject selectedObject;
     public Bloc selectedBloc;
+    public bool Actiu = true;
     Vector3 offset;
     Vector3 lastPos;
 
@@ -64,36 +65,39 @@ public class Arrastrador : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3 mouseDelta = Input.mousePosition - lastPos;
-        if (Input.GetMouseButtonDown(0))
-        {
-            if(Vector3.Distance(Input.mousePosition,lastPos)>=0.075f && !IsPointerOverUIElement() ){
-                Collider2D[] results = Physics2D.OverlapPointAll(mousePosition);
-                if(results.Length!=0){
-                    Collider2D highestCollider = GetHighestObject(results);
-                    selectedObject = highestCollider.transform.gameObject;
-                    if(selectedObject.tag == "Bloc" || selectedObject.tag == "Generador"){
-                        selectedBloc = selectedObject.GetComponent<Bloc>();
-                        offset = selectedObject.transform.position - mousePosition;
+        if(Actiu){
 
-                    }else{
-                        selectedObject = null;
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseDelta = Input.mousePosition - lastPos;
+            if (Input.GetMouseButtonDown(0))
+            {
+                if(Vector3.Distance(Input.mousePosition,lastPos)>=0.075f && !IsPointerOverUIElement() ){
+                    Collider2D[] results = Physics2D.OverlapPointAll(mousePosition);
+                    if(results.Length!=0){
+                        Collider2D highestCollider = GetHighestObject(results);
+                        selectedObject = highestCollider.transform.gameObject;
+                        if(selectedObject.tag == "Bloc" || selectedObject.tag == "Generador"){
+                            selectedBloc = selectedObject.GetComponent<Bloc>();
+                            offset = selectedObject.transform.position - mousePosition;
 
-                    } 
+                        }else{
+                            selectedObject = null;
+
+                        } 
+
+                    }
 
                 }
-
+                lastPos = Input.mousePosition;
             }
-            lastPos = Input.mousePosition;
-        }
-        if (selectedObject)
-        {
-            selectedObject.transform.position = mousePosition + offset;
-        }
-        if (Input.GetMouseButtonUp(0) && selectedObject)
-        {
-            selectedObject = null;
+            if (selectedObject)
+            {
+                selectedObject.transform.position = mousePosition + offset;
+            }
+            if (Input.GetMouseButtonUp(0) && selectedObject)
+            {
+                selectedObject = null;
+            }
         }
     }
 }
