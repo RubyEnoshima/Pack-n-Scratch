@@ -1,15 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class Mapa : MonoBehaviour
 {
     public GameObject DepartamentDesbloqueig;
-    
 
     void Start(){
-        DepartamentDesbloqueig.SetActive(Global.estaDesbloquejat);
+        DepartamentDesbloqueig.GetComponent<Button>().interactable = Global.estaDesbloquejat;
     }
     public void EntrarDepartament(string Departament){
         Global.Departament = Departament;

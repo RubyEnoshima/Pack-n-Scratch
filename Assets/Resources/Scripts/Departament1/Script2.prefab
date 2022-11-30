@@ -55,9 +55,11 @@ MonoBehaviour:
   - 
   - 
   SonInputsNombres: 1
-  ResultatsEsperats:
+  ResultatsEsperats1:
   - True
+  ResultatsEsperats2:
   - False
+  ResultatsEsperats3:
   - False
   Descripcio: Avui m'ha donat per sopar un dos. Vull veure un True si l'input es
     un dos i False si no. La veritat, estan bastant bons.

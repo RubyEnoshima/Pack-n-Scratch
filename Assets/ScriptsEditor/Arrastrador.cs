@@ -6,6 +6,7 @@ public class Arrastrador : MonoBehaviour
 {
     int UILayer;
     public GameObject selectedObject;
+    public GameObject Fletxa;
     public Bloc selectedBloc;
     public bool Actiu = true;
     Vector3 offset;
@@ -71,6 +72,7 @@ public class Arrastrador : MonoBehaviour
             Vector3 mouseDelta = Input.mousePosition - lastPos;
             if (Input.GetMouseButtonDown(0))
             {
+                if(Fletxa.activeSelf) Fletxa.SetActive(false);
                 if(Vector3.Distance(Input.mousePosition,lastPos)>=0.075f && !IsPointerOverUIElement() ){
                     Collider2D[] results = Physics2D.OverlapPointAll(mousePosition);
                     if(results.Length!=0){

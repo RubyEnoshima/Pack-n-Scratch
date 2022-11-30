@@ -10,7 +10,9 @@ public class Script : MonoBehaviour
 
     public bool SonInputsNombres = true;
 
-    public string[] ResultatsEsperats = {"6","12","2"};
+    public List<string> ResultatsEsperats1 = new List<string>(){"6"};
+    public List<string> ResultatsEsperats2 = new List<string>(){"12"};
+    public List<string> ResultatsEsperats3 = new List<string>(){"2"};
 
     public string Descripcio = "Volem que l'script multipliqui l'entrada per 2.";
     public string Inspiracio = "L'script semblava correcte...";

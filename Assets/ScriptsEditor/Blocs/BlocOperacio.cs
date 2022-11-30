@@ -39,6 +39,12 @@ public class BlocOperacio : Bloc
         return DividintZero || MalFormatejat;
     }
 
+    public override string ObtenirError()
+    {
+        if(DividintZero) return "Dividir per zero dona infinit...";
+        return "Potser el nombre esta mal escrit...";
+    }
+
     public override void Iniciar(){
         base.Iniciar();
         VariablesB.value = VariableValorB;
@@ -158,9 +164,13 @@ public class BlocOperacio : Bloc
                     Resultat = A / B;
                 }
                 break;
+
+            case "%":
+                Resultat = A % B;
+                break;
         }
         
-        Debug.Log(Resultat);
+//        Debug.Log(Resultat);
     }
 
     public override dynamic ResultatBloc(){

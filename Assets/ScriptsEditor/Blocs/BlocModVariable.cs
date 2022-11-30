@@ -24,6 +24,12 @@ public class BlocModVariable : BlocVariable
         return DiferentTipus || UtilitzantInput;
     }
 
+    public override string ObtenirError()
+    {
+        if(DiferentTipus) return "No crec que pugui modificar el tipus d'una variable...";
+        return "No crec que pugui modificar l'Input...";
+    }
+
     public void CanviarVariable(){
         if(Editor.Variables.Count > 0){
             v = Editor.Variables[Variables.value];

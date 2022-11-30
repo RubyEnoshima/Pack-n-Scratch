@@ -15,7 +15,7 @@ public class BlocPrint : Bloc
     protected override void Start(){
         base.Start();
         Funcio = "Print";
-        input = GetComponentInChildren<InputField>();
+        input = GetComponentInChildren<InputField>(true);
         Pantalla = Editor.Pantalla;
         TextVarBloc = TipusPrint.value;
     }

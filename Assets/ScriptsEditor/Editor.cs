@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -26,18 +27,27 @@ public class Editor : MonoBehaviour
     public GameObject PagSeg;
     public GameObject PagAnt;
 
-    public int TotalScripts = 1; // De moment
+    public int TotalScripts = 2; // De moment
     public int nScripts = 0;
     public float nIncorrectes = 0;
     public int nCorrectes = 0;
     public int intents = 3;
+    bool executant = false;
 
     public Cafeina CafeinaScr;
     public int Cafeina = 5;
     public Dia Dia;
     public Notificacio Notificacio;
     public Script ScriptActual;
+    int nScriptActual = -1;
     public Arrastrador Arrastrador;
+
+    public GameObject FletxaExecucio;
+    List<string> Outputs;
+    bool error = false;
+    bool destruint = false;
+    public Pensament Pensament;
+
     public void CanviarInput(Script s, int inputNum){
         if(s.SonInputsNombres){
             float inputVal = s.Inputs[inputNum];
@@ -70,6 +80,7 @@ public class Editor : MonoBehaviour
     }
 
     public void PaginaAnterior(){
+        if(FletxaExecucio.activeSelf) FletxaExecucio.SetActive(false);
         Blocs.transform.GetChild(paginaAct).gameObject.SetActive(false);
 
         paginaAct--;
@@ -86,6 +97,8 @@ public class Editor : MonoBehaviour
     }
 
     public void PaginaSeguent(){
+        if(FletxaExecucio.activeSelf) FletxaExecucio.SetActive(false);
+
         Blocs.transform.GetChild(paginaAct).gameObject.SetActive(false);
 
         paginaAct++;
@@ -97,6 +110,12 @@ public class Editor : MonoBehaviour
         Ple = new List<bool>(aux);
         for(int i=0;i<Blocs.transform.GetChild(paginaAct).childCount;i++){
             Ple[i] = true;
+        }
+    }
+
+    public void TornarPrimeraPagina(){
+        while(paginaAct!=0){
+            PaginaSeguent();
         }
     }
 
@@ -214,21 +233,24 @@ public class Editor : MonoBehaviour
     }
 
     public void TreureBloc(Bloc bloc){
-        int n = 1;
-        GameObject Slot = bloc.Slot;
-        foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>(true)){
-            if(b==bloc) continue;
+        if(!destruint){
+            int n = 1;
+            GameObject Slot = bloc.Slot;
+            foreach(Bloc b in Blocs.GetComponentsInChildren<Bloc>(true)){
+                if(b==bloc) continue;
 
-            PujarSlot(b);
-            b.CanviarNombre(n);
-            b.ActualitzarBloc();
-            b.ActualitzarVariables();
+                PujarSlot(b);
+                b.CanviarNombre(n);
+                b.ActualitzarBloc();
+                b.ActualitzarVariables();
 
-            n++;
-        }
+                n++;
+            }
 
-        if(Blocs.transform.GetChild(paginaAct).childCount==4){
-            TreurePagina();
+            if(Blocs.transform.GetChild(paginaAct).childCount==4){
+                TreurePagina();
+            }
+
         }
     }
 
@@ -254,11 +276,11 @@ public class Editor : MonoBehaviour
             Ple[3] = true;
         }else{
             Ple[ultimChar] = false;
-            Ple[ultimChar-1] = true;
+            if(ultimChar!=0) Ple[ultimChar-1] = true;
             SlotFinal = GameObject.Find("Slot"+ultimChar);
 
         }
-
+        
         bloc.transform.position = SlotFinal.transform.position;
         bloc.Slot = SlotFinal;
         bloc.nBloc--;
@@ -275,52 +297,94 @@ public class Editor : MonoBehaviour
         else{
             Notificacio.CanviarNotis(TotalScripts);
             // Agafar un script al atzar
-            CarregarScript("");
+            CarregarScript(Global.ScriptAleatori());
             intents = 3;
         }
     }
 
+    public void GuardarOutput(Bloc b){
+        if(b is BlocPrint){
+            Outputs.Add(b.ResultatBloc());
+        }
+    }
+
     public IEnumerator ExecutarLent(){
+        TornarPrimeraPagina();
+        Outputs = new List<string>();
+        FletxaExecucio.SetActive(true);
+        error = false;
         foreach(Transform pagina in Blocs.transform){
             foreach(Transform bloc in pagina){
-                bloc.GetComponent<Bloc>().Executar();
-                yield return new WaitForSeconds(0.5f);
+                Bloc b = bloc.GetComponent<Bloc>();
+                b.Executar();
+                GuardarOutput(b);
+
+                FletxaExecucio.transform.position = new Vector3(FletxaExecucio.transform.position.x,
+                                                                bloc.transform.position.y,
+                                                                FletxaExecucio.transform.position.z);
+    
+                if(b.TeErrors()){
+                    Debug.Log(b.ObtenirError());
+                    Pensament.CanviarText(b.ObtenirError());
+                    Pensament.FerApareixer();
+                    error = true;
+                    break;
+                }
+
+
+                yield return new WaitForSeconds(0.75f);
             }
+            if(error) break;
+            PaginaSeguent();
+        }
+        if(!error){
+            FletxaExecucio.SetActive(false);
+            TornarPrimeraPagina();
         }
     }
 
     public void ExecutarRapid(){
+        Outputs = new List<string>();
         foreach(Transform pagina in Blocs.transform){
             foreach(Transform bloc in pagina){
                 bloc.GetComponent<Bloc>().Executar();
+                GuardarOutput(bloc.GetComponent<Bloc>());
+
             }
         }
     }
 
     public IEnumerator CompilarAux(){
-        yield return StartCoroutine(ExecutarLent());
+        if(!executant){
+            executant = true;
 
-        if(EsCorrecte()){
-            nCorrectes++;
-            if(Cafeina<10) Cafeina++;
-            if(ScriptActual.esDesbloqueig){
-                Global.estaDesbloquejat = true;
-            }
-            PostCompilar();
-            Debug.Log("Bien");
-        }else{
-            CanviarInput(ScriptActual,0);
-            Debug.Log("Mal");
-            intents--;
-            nIncorrectes += 0.3f;
-            if(intents==0){
-                if(Cafeina>0) Cafeina--;
+            yield return StartCoroutine(ExecutarLent());
+
+            if(EsCorrecte()){
+                Debug.Log("Bien");
+                nCorrectes++;
+                if(Cafeina<10) Cafeina++;
+                if(ScriptActual.esDesbloqueig){
+                    Global.estaDesbloquejat = true;
+                }
+                Debug.Log(nScriptActual);
+                Global.Fet(nScriptActual);
                 PostCompilar();
+            }else{
+                Debug.Log("Mal");
+                CanviarInput(ScriptActual,0);
+                intents--;
+                nIncorrectes += 0.3f;
+                if(intents==0){
+                    if(Cafeina>0) Cafeina--;
+                    PostCompilar();
+                }
             }
+            CafeinaScr.ActualitzarCafeina(Cafeina);
+            // Mostrar gag
+            Arrastrador.Actiu = true;
+            executant = false;
         }
-        CafeinaScr.ActualitzarCafeina(Cafeina);
-        // Mostrar gag
-        Arrastrador.Actiu = true;
     }
 
     public void Compilar(){
@@ -337,11 +401,25 @@ public class Editor : MonoBehaviour
             Cafeina -= 3;
             CafeinaScr.ActualitzarCafeina(Cafeina);
             Debug.Log(ScriptActual.Inspiracio);
-
+            Pensament.CanviarText(ScriptActual.Inspiracio);
+            Pensament.FerApareixer();
         }
     }
 
+    public void Resetejar(){
+        CarregarScript("Script"+nScriptActual);
+    }
+
     public void CarregarScript(string scriptNom){
+        Variables = new List<Variable>();
+        Pantalla.CanviarText("");
+        destruint = true;
+        foreach(Bloc child in Blocs.GetComponentsInChildren<Bloc>(true)){
+            DestroyImmediate(child.gameObject);
+        }
+        while(nPagines>1) TreurePagina();
+        destruint = false;
+        nScriptActual = int.Parse(scriptNom[scriptNom.Length-1].ToString());
         GameObject scriptPrefab = (GameObject)Resources.Load("Scripts/"+Global.Departament+"/"+scriptNom, typeof(GameObject));
         
         GameObject script = Instantiate(scriptPrefab);
@@ -351,6 +429,7 @@ public class Editor : MonoBehaviour
 
         bool[] aux1 = {false,false,false,false};
         bool[] aux = {false,false,false,false};
+        Ple = new List<bool>(aux);
         int i = 0, j = 1;
         foreach(Bloc fill in script.GetComponentsInChildren<Bloc>(true)){
             fill.Editor = this;
@@ -383,14 +462,22 @@ public class Editor : MonoBehaviour
     }
 
     public bool EsCorrecte(){
-        if(Pantalla.text.text == ScriptActual.ResultatsEsperats[0]){
+        if(!error && Enumerable.SequenceEqual(Outputs, ScriptActual.ResultatsEsperats1)){
             CanviarInput(ScriptActual,1);
             ExecutarRapid();
-            if(Pantalla.text.text == ScriptActual.ResultatsEsperats[1]){
+            if(Enumerable.SequenceEqual(Outputs, ScriptActual.ResultatsEsperats2)){
                 CanviarInput(ScriptActual,2);
                 ExecutarRapid();
-                return Pantalla.text.text == ScriptActual.ResultatsEsperats[2];
+                return Enumerable.SequenceEqual(Outputs, ScriptActual.ResultatsEsperats3);
             }
+            Debug.Log("El programa no funciona amb altres inputs...");
+            Pensament.CanviarText("Sembla que el programa no funciona amb inputs diferents...");
+            Pensament.FerApareixer();
+        }
+        else if(!error) {
+            Debug.Log("Hm, l'output no es el que es demanava");
+            Pensament.CanviarText("Hm, l'output no es el que es demanava...");
+            Pensament.FerApareixer();
         }
         return false;
     }
@@ -414,11 +501,12 @@ public class Editor : MonoBehaviour
         Ple = new List<bool>(aux);
 
         // Agafar un al atzar
-        CarregarScript("Script2");
+        // CarregarScript(Global.ScriptAleatori());
+        CarregarScript("Script1");
         Notificacio.CanviarNotis(TotalScripts);
         // ACORDARSE DE DESCOMENTAR!!!!!!!!!!!!!!!!!!!
-        /*SceneManager.sceneUnloaded += new UnityEngine.Events.UnityAction<Scene>(delegate {MAIN.SetActive(true);});
-        Tancar();*/
+        SceneManager.sceneUnloaded += new UnityEngine.Events.UnityAction<Scene>(delegate {MAIN.SetActive(true);});
+        Tancar();
     }
 
     // Update is called once per frame

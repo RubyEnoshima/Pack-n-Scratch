@@ -46,15 +46,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ffc524fdfa66424db2f6618614c9c67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Input: 3
-  InputSecret: 6
-  ResultatEsperat: 6
-  ResultatEsperatSecret: 12
-  Descripcio: No preguntis per que, pero m'encantaria que es dupliqui el nombre que
-    entra per l'input.
-  Inspiracio: L'script semblava correcte...
+  Inputs:
+  - 3
+  - 6
+  - 1
+  InputsString:
+  - 
+  - 
+  - 
+  SonInputsNombres: 1
+  ResultatsEsperats1:
+  - 6
+  ResultatsEsperats2:
+  - 12
+  ResultatsEsperats3:
+  - 2
+  Descripcio: Se que aixo es atencio al client, pero em moro de gana i volia fer
+    que la maquina expenedora tires el doble de menjar. Pots comprovar si ho he fet
+    be?
+  Inspiracio: L'script sembla correcte...
   Client: Agapito Dissousa
-  Assumpte: Un asunto por defectoooo
+  Assumpte: Fes-me un favor...
+  esDesbloqueig: 0
 --- !u!1001 &5313463628847756698
 PrefabInstance:
   m_ObjectHideFlags: 0

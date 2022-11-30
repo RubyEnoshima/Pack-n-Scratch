@@ -50,6 +50,10 @@ public class Bloc : MonoBehaviour
         return false;
     }
 
+    public virtual string ObtenirError(){
+        return "";
+    }
+
     public virtual void Executar(){
 
     }
