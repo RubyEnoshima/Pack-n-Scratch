@@ -20,6 +20,12 @@ public class BlocPrint : Bloc
         TextVarBloc = TipusPrint.value;
     }
 
+    public override void Iniciar()
+    {
+        base.Iniciar();
+        input = GetComponentInChildren<InputField>(true);
+    }
+
     bool BlocValid(Bloc bloc){
         return bloc.nBloc != nBloc;
     }

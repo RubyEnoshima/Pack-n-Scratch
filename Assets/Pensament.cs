@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Pensament : MonoBehaviour
 {
     public Text text;
-    bool apareix = false;
+    public bool apareix = false;
     public GameObject Bombolla;
     public GameObject Boto;
 

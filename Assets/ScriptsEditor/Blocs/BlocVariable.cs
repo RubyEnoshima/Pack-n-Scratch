@@ -118,4 +118,9 @@ public class BlocVariable : Bloc
         base.OnDestroy();
         Editor.EsborrarVariable(nVariable);
     }
+
+    public override dynamic ResultatBloc()
+    {
+        return v.nom+"<-"+v.Get();
+    }
 }

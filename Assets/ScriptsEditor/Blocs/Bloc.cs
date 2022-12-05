@@ -16,6 +16,7 @@ public class Bloc : MonoBehaviour
     public string Funcio;
     public bool colocat = false;
     public bool enEditor = false;
+    public bool DestruirFlag = false;
     public int nBloc = -1;
     public int VariableValor = -1;
     public int BlocValor = -1;
@@ -121,7 +122,7 @@ public class Bloc : MonoBehaviour
     }
 
     protected virtual void OnDestroy() {
-        if(enEditor) Editor.TreureBloc(this);
+        if(enEditor && !DestruirFlag) Editor.TreureBloc(this);
     }
 
     public virtual dynamic ResultatBloc(){
@@ -143,7 +144,7 @@ public class Bloc : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(colocat && Clicker.selectedObject && Clicker.selectedObject==this.gameObject){
+        if(colocat && Clicker &&  Clicker.selectedObject && Clicker.selectedObject==this.gameObject){
             //transform.parent = null;
             colocat = false;
         }else if(!colocat && !Clicker.selectedObject){
