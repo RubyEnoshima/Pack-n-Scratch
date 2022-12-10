@@ -17,5 +17,6 @@ public class Cafeina : MonoBehaviour
         else if(Cafeina==5 || Cafeina==6) img.sprite = mig;
         else if(Cafeina==7 || Cafeina==8) img.sprite = migple;
         else img.sprite = ple;
+        transform.parent.GetComponent<Image>().sprite = img.sprite;
     }
 }

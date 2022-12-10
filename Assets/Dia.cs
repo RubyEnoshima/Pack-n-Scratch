@@ -11,6 +11,7 @@ public class Dia : MonoBehaviour
     public Text Percentatge;
 
     public void AcabarDia(int correctes, int incorrectes, float mitjana){
+        if(Global.ProvaSuperada1 && Global.ProvaSuperada2) SceneManager.LoadScene("Final");
         this.gameObject.SetActive(true);
 
         ScriptsCorrectes.text = correctes.ToString();
@@ -21,6 +22,8 @@ public class Dia : MonoBehaviour
         Global.suma+=mitjana;
         Global.mitjana = Global.suma / Global.dia;
         Global.dia++;
+
+        Global.ComprovarProva();
     }
     
     public void Acabar(){

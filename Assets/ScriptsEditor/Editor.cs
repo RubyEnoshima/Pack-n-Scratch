@@ -8,8 +8,15 @@ using UnityEngine.UI;
 
 public class Editor : MonoBehaviour
 {
+    class IFStruct{
+        public BlocIf IF;
+        public bool saltantIf = false;
+        public bool dinsIf = false;
+    };
     public GameObject MAIN;
     public VideoPlayer GAG;
+    public GameObject Text1;
+    public GameObject Text2;
     public GameObject OCULTARGAG;
     public GameObject OCULTARCANVAS;
     public Transform MainPos;
@@ -19,6 +26,7 @@ public class Editor : MonoBehaviour
     public Pantalla Pantalla;
     public List<Variable> Variables;
     public int MaxVariables = 10;
+    public GameObject Generadors;
 
     public dynamic Input = 10;
     public Pantalla InputPantalla;
@@ -40,6 +48,7 @@ public class Editor : MonoBehaviour
     public int nCorrectes = 0;
     public int intents = 3;
     bool executant = false;
+    bool esProva = false;
 
     public Cafeina CafeinaScr;
     public int Cafeina = 5;
@@ -54,9 +63,20 @@ public class Editor : MonoBehaviour
     bool error = false;
     bool destruint = false;
     public Pensament Pensament;
+    public Tutorial tutorial;
+    public Button TancarBoto;
+    public Button ResetejarBoto;
+    public Button CafeinaBoto;
+    public Button NotificacioCorreu;
+    public Button NotificacioPaquet;
+    public Button PensamentBoto;
+    public Button SortirBoto;
+    public GameObject PistaCafeina;
+    public bool PlaygroundMode = false;
 
     void OnDestroy() {
         destruint = true;
+        Global.pistaOfi = false;
     }
 
     public void CanviarInput(Script s, int inputNum){
@@ -87,7 +107,7 @@ public class Editor : MonoBehaviour
         else if(Slot2.OverlapPoint(posicioRatoli)) return Slot2;
         else if(Slot3.OverlapPoint(posicioRatoli)) return Slot3;
         else if(Slot4.OverlapPoint(posicioRatoli)) return Slot4;
-        else return GetComponent<Collider2D>();
+        else return null;
     }
 
     public void PaginaAnterior(){
@@ -236,12 +256,16 @@ public class Editor : MonoBehaviour
                     AfegirPagina();
                 }
 
+                bloc.enEditor = true;
+
             }else{
+                //bloc.enEditor = false;
                 Destroy(bloc.gameObject);
 
             }
 
         }else{
+            //bloc.enEditor = false;
             Destroy(bloc.gameObject);
         }
     }
@@ -340,6 +364,9 @@ public class Editor : MonoBehaviour
         nScripts++;
         if(TotalScripts==0){
             Dia.AcabarDia(nCorrectes,(int)nIncorrectes,CalcularMitjana());
+            NotificacioCorreu.gameObject.SetActive(false);
+            NotificacioPaquet.gameObject.SetActive(false);
+            Notificacio.gameObject.SetActive(false);
             this.gameObject.SetActive(false);
             Arrastrador.Actiu = false;
         }
@@ -354,30 +381,40 @@ public class Editor : MonoBehaviour
 
     public void GuardarOutput(Bloc b){
         if(b is BlocPrint){
-            Outputs.Add(b.ResultatBloc());
+            Outputs.Add(((string)b.ResultatBloc()).ToLower());
         }
     }
 
     public IEnumerator EsperarGag(){
-        if(GAG.isPlaying) yield return new WaitForSeconds((float)(GAG.length - GAG.time));
+        float temps = (float)(GAG.length - GAG.time);
+        Debug.Log(temps);
+        yield return new WaitForSeconds(temps);
         StopGag();
+        if(!error){
+            FletxaExecucio.SetActive(false);
+            TornarPrimeraPagina();
+        }
     }
 
     public IEnumerator ExecutarLent(){
         TornarPrimeraPagina();
 
         ExecutarRapid(); // Per saber quin gag hem de posar, si un correcte o incorrecte
-        bool correcte = !error && Enumerable.SequenceEqual(Outputs, ScriptActual.ResultatsEsperats1);
+        List<string> res = new List<string>();
+        if(!PlaygroundMode) res = ScriptActual.ResultatsEsperats1.ConvertAll(d => d.ToLower());
+        bool correcte = PlaygroundMode || (!error && Enumerable.SequenceEqual(Outputs, res));
         PlayGag(correcte);
 
         Outputs = new List<string>();
         FletxaExecucio.SetActive(true);
         Pantalla.CanviarText("");
-        if(!correcte) Pantalla.gameObject.SetActive(false);
+        Pantalla.gameObject.SetActive(correcte);
         error = false;
 
-        bool saltantIf = false;
-        bool dinsIf = false;
+        int ifs = 0;
+        int ifsAux = 0;
+        List<IFStruct> IFS = new List<IFStruct>();
+        IFStruct actual = null;
 
         Pantalla Pista = FletxaExecucio.GetComponent<Pantalla>();
         foreach(Transform pagina in Blocs.transform){
@@ -385,23 +422,39 @@ public class Editor : MonoBehaviour
             foreach(Transform bloc in pagina){
                 Bloc b = bloc.GetComponent<Bloc>();
 
+                if(ifs>0) actual = IFS.Last();
+                if(b is BlocIf) ifsAux++;
                 // Si hem de saltar, saltem fins que trobem el tope
-                if((saltantIf && !(b is BlocElse) && !(b is BlocEndIf))) continue;
-                //saltantIf = false;
-
+                if(( actual != null && actual.saltantIf && !(b is BlocElse) && !(b is BlocEndIf))) continue;
+                
                 b.Executar();
                 if(b is BlocIf || b is BlocElse){
-                    if(b is BlocIf && b.ResultatBloc() || b is BlocElse && saltantIf){
-                        dinsIf = true;
-                        saltantIf = false;
-                    }else{
-                        dinsIf = false;
-                        saltantIf = true;
+                    if(b is BlocIf){
+                        ifs++;
+                        IFStruct ifstruct = new IFStruct();
+                        ifstruct.IF = b as BlocIf;
+                        IFS.Add(new IFStruct());
+                        actual = ifstruct;
                     }
-                }else if(b is BlocEndIf && (dinsIf || saltantIf)){
-                    dinsIf = false;
-                    saltantIf = false;
+                    else if(b is BlocElse && ifs<=0) (b as BlocElse).PosarError();
+
+                    if(b is BlocIf && b.ResultatBloc() || b is BlocElse && actual != null && actual.saltantIf){
+                        actual.dinsIf = true;
+                        actual.saltantIf = false;
+                        IFS[ifs-1] = actual;
+                    }else{
+                        actual.dinsIf = false;
+                        actual.saltantIf = true;
+                        IFS[ifs-1] = actual;
+
+                    }
+                }else if(b is BlocEndIf && actual != null && (actual.dinsIf || actual.saltantIf)){
+                    ifs--;
+                    ifsAux--;
+                    IFS.Remove(actual);
+                    if(ifsAux < 0) (b as BlocEndIf).PosarError(); // No hauria de passar
                 }
+                
                 GuardarOutput(b);
 
                 FletxaExecucio.transform.position = new Vector3(FletxaExecucio.transform.position.x,
@@ -418,34 +471,92 @@ public class Editor : MonoBehaviour
                 }
 
 
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(1.2f);
             }
             if(error) break;
             PaginaSeguent();
         }
-        Debug.Log("Sacabo");
-        yield return StartCoroutine(EsperarGag());
-        if(!error){
-            FletxaExecucio.SetActive(false);
-            TornarPrimeraPagina();
+
+        // Ifs no tancats
+        if(ifs > 0){
+            Debug.Log("Hi ha un if que no esta ben tancat...");
+            Pensament.CanviarText("Hi ha un if que no esta ben tancat...");
+            Pensament.FerApareixer();
+            error = true;
+            FletxaExecucio.transform.position = new Vector3(FletxaExecucio.transform.position.x,
+                                                                IFS[ifs-1].IF.transform.position.y,
+                                                                FletxaExecucio.transform.position.z);
+            Pista.CanviarText("ups");
+            FletxaExecucio.SetActive(true);
         }
+
+        yield return StartCoroutine(EsperarGag());
+        
     }
 
     public void ExecutarRapid(){
         Outputs = new List<string>();
+        int ifs = 0;
+        int ifsAux = 0;
+        List<IFStruct> IFS = new List<IFStruct>();
+        IFStruct actual = null;
         foreach(Transform pagina in Blocs.transform){
             foreach(Transform bloc in pagina){
                 Bloc b = bloc.GetComponent<Bloc>();
+
+                if(ifs>0) actual = IFS.Last();
+                if(b is BlocIf) ifsAux++;
+                // Si hem de saltar, saltem fins que trobem el tope
+                if(( actual != null && actual.saltantIf && !(b is BlocElse) && !(b is BlocEndIf))) continue;
+
                 b.Executar();
+
+                if(b is BlocIf || b is BlocElse){
+                    if(b is BlocIf){
+                        ifs++;
+                        IFStruct ifstruct = new IFStruct();
+                        ifstruct.IF = b as BlocIf;
+                        IFS.Add(new IFStruct());
+                        actual = ifstruct;
+                    }
+                    else if(b is BlocElse && ifs<=0) (b as BlocElse).PosarError();
+
+                    if(b is BlocIf && b.ResultatBloc() || b is BlocElse && actual != null && actual.saltantIf){
+                        actual.dinsIf = true;
+                        actual.saltantIf = false;
+                        IFS[ifs-1] = actual;
+                    }else{
+                        actual.dinsIf = false;
+                        actual.saltantIf = true;
+                        IFS[ifs-1] = actual;
+
+                    }
+                }else if(b is BlocEndIf && actual != null && (actual.dinsIf || actual.saltantIf)){
+                    ifs--;
+                    ifsAux--;
+                    IFS.Remove(actual);
+                    if(ifsAux < 0) (b as BlocEndIf).PosarError(); // No hauria de passar
+                }
+
                 GuardarOutput(bloc.GetComponent<Bloc>());
                 
                 // Ho comprovem, però en iteracions seguents no hi hauria d'haver
                 if(b.TeErrors()){ 
+                    Debug.Log(b.ObtenirError());
                     Pensament.CanviarText(b.ObtenirError());
                     Pensament.FerApareixer();
                     error = true;
                 }
             }
+            if(error) break;
+        }
+
+        // Ifs no tancats
+        if(ifs > 0){
+            Debug.Log("Hi ha un if que no esta ben tancat...");
+            Pensament.CanviarText("Hi ha un if que no esta ben tancat...");
+            Pensament.FerApareixer();
+            error = true;
         }
     }
 
@@ -456,17 +567,19 @@ public class Editor : MonoBehaviour
             yield return StartCoroutine(ExecutarLent());
 
             if(EsCorrecte()){
-                Debug.Log("Bien");
-                nCorrectes++;
-                if(Cafeina<10) Cafeina++;
-                if(ScriptActual.esDesbloqueig){
-                    Global.estaDesbloquejat = true;
+                if(!PlaygroundMode){
+                    Debug.Log("Bien");
+                    nCorrectes++;
+                    if(Cafeina<10) Cafeina+=3;
+                    else Cafeina = 10;
+                
+                    Pensament.CanviarText("Sembla que ho he fet be!");
+                    Pensament.FerApareixer();
+                    Global.Fet(nScriptActual);
+                    Global.EsPotDesbloquejar();
+                    PostCompilar();
+
                 }
-                Debug.Log(nScriptActual);
-                Pensament.CanviarText("Sembla que ho he fet be!");
-                Pensament.FerApareixer();
-                Global.Fet(nScriptActual);
-                PostCompilar();
             }else{
                 Debug.Log("Mal");
                 CanviarInput(ScriptActual,0);
@@ -485,8 +598,11 @@ public class Editor : MonoBehaviour
     }
 
     public void Compilar(){
-        StartCoroutine(CompilarAux());
-        Arrastrador.Actiu = false;
+        if(Global.tutoEditor){
+            StartCoroutine(CompilarAux());
+            Arrastrador.Actiu = false;
+
+        }
     }
 
     public float CalcularMitjana(){
@@ -494,7 +610,7 @@ public class Editor : MonoBehaviour
     }
 
     public void UtilitzarCafeina(){
-        if(Cafeina>=3){
+        if(Cafeina>=3 && !PlaygroundMode){
             Cafeina -= 3;
             CafeinaScr.ActualitzarCafeina(Cafeina);
             Debug.Log(ScriptActual.Inspiracio);
@@ -504,18 +620,22 @@ public class Editor : MonoBehaviour
     }
 
     public void Resetejar(){
-        CarregarScript("Script"+nScriptActual);
+        if(esProva) CarregarScript("Prova");
+        else CarregarScript("Script"+nScriptActual);
     }
 
-
     public bool EsCorrecte(){
-        if(!error && Enumerable.SequenceEqual(Outputs, ScriptActual.ResultatsEsperats1)){
+        if(PlaygroundMode) return true;
+        List<string> res = ScriptActual.ResultatsEsperats1.ConvertAll(d => d.ToLower());
+        if(!error && Enumerable.SequenceEqual(Outputs, res)){
             CanviarInput(ScriptActual,1);
             ExecutarRapid();
-            if(Enumerable.SequenceEqual(Outputs, ScriptActual.ResultatsEsperats2)){
+            res = ScriptActual.ResultatsEsperats2.ConvertAll(d => d.ToLower());
+            if(Enumerable.SequenceEqual(Outputs, res)){
                 CanviarInput(ScriptActual,2);
                 ExecutarRapid();
-                return Enumerable.SequenceEqual(Outputs, ScriptActual.ResultatsEsperats3);
+                res = ScriptActual.ResultatsEsperats3.ConvertAll(d => d.ToLower());
+                return Enumerable.SequenceEqual(Outputs, res);
             }
             Debug.Log("El programa no funciona amb altres inputs...");
             Pensament.CanviarText("Sembla que el programa no funciona amb inputs diferents...");
@@ -530,6 +650,21 @@ public class Editor : MonoBehaviour
     }
     
     public void CarregarScript(string scriptNom){
+        if(PlaygroundMode){
+            Notificacio.Assumpte.text = "Playground";
+            Notificacio.Nom.text = "Playground";
+            Notificacio.Descripcio.text = "Fes el que vulguis sense preocupar-te de cap restriccio ni script.";
+            float inputVal = Mathf.Round(UnityEngine.Random.Range(0f,100f) * 100f) / 100f;
+            InputPantalla.CanviarText(inputVal.ToString());
+            FloatVariable input = new FloatVariable();
+            input.Crear("Input",inputVal,0);
+            if(Variables.Count==0)
+                Variables.Add(input);
+            else
+                Variables[0] = input;
+            return;
+        }
+
         Variables = new List<Variable>();
         Pantalla.CanviarText("");
         destruint = true;
@@ -541,7 +676,10 @@ public class Editor : MonoBehaviour
         }
         while(nPagines>1) TreurePagina();
         destruint = false;
-        nScriptActual = int.Parse(scriptNom[scriptNom.Length-1].ToString());
+
+        if(esProva) nScriptActual = -1;
+        else nScriptActual = int.Parse(scriptNom[scriptNom.Length-1].ToString());
+
         GameObject scriptPrefab = (GameObject)Resources.Load("Scripts/"+Global.Departament+"/"+scriptNom, typeof(GameObject));
         
         GameObject script = Instantiate(scriptPrefab);
@@ -560,7 +698,6 @@ public class Editor : MonoBehaviour
             GameObject slot = GameObject.Find("Slot"+(j).ToString());
             
             AfegirBloc(fill,slot);
-            Debug.Log(fill.name);
             fill.Iniciar();
             j++;
             if(j>4){
@@ -594,6 +731,21 @@ public class Editor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if(Global.tutoEditor){
+            tutorial.Pistas[0].gameObject.SetActive(false);
+            PistaCafeina.SetActive(true);
+            Destroy(tutorial.gameObject);
+        }else{
+            Arrastrador.Actiu = false;
+            TancarBoto.interactable = false;
+            ResetejarBoto.interactable = false;
+            CafeinaBoto.interactable = false;
+            NotificacioCorreu.interactable = false;
+            NotificacioPaquet.interactable = false;
+            PensamentBoto.interactable = false;
+            SortirBoto.interactable = false;
+        }
+
         Blocs = transform.Find("Blocs").gameObject;
         Variables = new List<Variable>();
         
@@ -602,21 +754,59 @@ public class Editor : MonoBehaviour
 
         GAG.isLooping = false;
 
-        // Agafar un al atzar
-        // CarregarScript(Global.ScriptAleatori());
-        CarregarScript("Script1");
-        TotalScripts = Global.ScriptsRestants()/2;
-        if(TotalScripts==0) TotalScripts = 1;
-        else if(Global.ScriptsRestants()==2) TotalScripts = 2;
+        if(!Global.EsPotFerProva() && !PlaygroundMode){
+            // Agafar un al atzar
+            CarregarScript(Global.ScriptAleatori());
+            // CarregarScript("Script2");
+            TotalScripts = Global.ScriptsRestants()-1;
+            if(TotalScripts==0) TotalScripts = 1;
+            else if(Global.ScriptsRestants()==2) TotalScripts = 2;
+
+        }else{
+            esProva = true;
+            CarregarScript("Prova");
+            TotalScripts = 1;
+        }
+
+        if(Global.Departament=="Departament2"){
+            Text1.SetActive(false);
+            Text2.SetActive(true);
+            Pantalla.text = Text2.GetComponent<Text>();
+        }else if(!PlaygroundMode){
+            Generadors.transform.GetChild(6).gameObject.SetActive(false);
+            Generadors.transform.GetChild(7).gameObject.SetActive(false);
+            Generadors.transform.GetChild(8).gameObject.SetActive(false);
+        }
+
         Notificacio.CanviarNotis(TotalScripts);
+
+        if(Global.ModeDaltonic){
+            foreach(Transform g in Generadors.transform){
+                if(g.name=="GeneradorComentaris") continue;
+                SpriteRenderer generador = g.GetChild(0).GetComponent<SpriteRenderer>();
+                generador.sprite = Resources.Load<Sprite>("Sprites/"+generador.sprite.name+"_daltonic");
+            }
+        }
+
         // ACORDARSE DE DESCOMENTAR!!!!!!!!!!!!!!!!!!!
-        // SceneManager.sceneUnloaded += new UnityEngine.Events.UnityAction<Scene>(delegate {MAIN.SetActive(true);});
-        //Tancar();
+        SceneManager.sceneUnloaded += new UnityEngine.Events.UnityAction<Scene>(delegate {if(MAIN) MAIN.SetActive(true);});
+        Tancar();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(!Global.tutoEditor && tutorial.desbloquejat){
+            Global.tutoEditor = true;
+            Arrastrador.Actiu = true;
+            TancarBoto.interactable = true;
+            ResetejarBoto.interactable = true;
+            CafeinaBoto.interactable = true;
+            NotificacioCorreu.interactable = true;
+            NotificacioPaquet.interactable = true;
+            PensamentBoto.interactable = true;
+            SortirBoto.interactable = true;
+
+        }
     }
 }

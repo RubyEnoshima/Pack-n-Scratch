@@ -10,6 +10,8 @@ public class Notificacio : MonoBehaviour
     public Text Assumpte;
     public Text Descripcio;
     public Text nNotis;
+    public GameObject Correu;
+    public GameObject Paquet;
     bool obert = false;
     
     public void SwitchPopup(){
@@ -25,5 +27,12 @@ public class Notificacio : MonoBehaviour
 
     public void CanviarNotis(int n){
         nNotis.text = n.ToString();
+    }
+
+    private void Start() {
+        if(Global.Departament=="Departament2"){
+            Paquet.SetActive(true);
+            Correu.SetActive(false);
+        }
     }
 }

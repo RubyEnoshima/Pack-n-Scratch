@@ -39,12 +39,16 @@ public class Bloc : MonoBehaviour
         Collider = GetComponent<Collider2D>();
         EditorCol = GameObject.Find("Editor").GetComponent<Collider2D>();
         Editor = GameObject.Find("Editor").GetComponent<Editor>();
-        Sprite = transform.gameObject.GetComponent<SpriteRenderer>();
+        Sprite = transform.Find("Fons").gameObject.GetComponent<SpriteRenderer>();
 
         if(Variables)
             Variables.onValueChanged.AddListener(delegate {CanviarVariableNum();});
         if(Blocs)
             Blocs.onValueChanged.AddListener(delegate {CanviarBlocNum();});
+
+        if(Global.ModeDaltonic){
+            Sprite.sprite = Resources.Load<Sprite>("Sprites/"+Sprite.sprite.name+"_daltonic");
+        }
     }
 
     public virtual bool TeErrors(){
@@ -122,7 +126,7 @@ public class Bloc : MonoBehaviour
     }
 
     protected virtual void OnDestroy() {
-        if(enEditor && !DestruirFlag) Editor.TreureBloc(this);
+        if(enEditor) Editor.TreureBloc(this);
     }
 
     public virtual dynamic ResultatBloc(){
@@ -152,18 +156,22 @@ public class Bloc : MonoBehaviour
 
             // No és a sobre de l'editor en sí
             if(!EditorCol.OverlapPoint(pos)){
+                //if(!enEditor) DestruirFlag = true;
                 EliminarEditor();
+                return;
             }
 
-            GameObject slot = Editor.ObtSlot(pos).gameObject;
+            GameObject slot = null;
+            if(Editor.ObtSlot(pos)) slot = Editor.ObtSlot(pos).gameObject;
             
-            if(!slot.name.StartsWith("Slot")){
+            if(slot==null){
+                //if(!enEditor) DestruirFlag = true;
                 EliminarEditor();
+                return;
             }
 
             if(!Slot || Slot && Slot!=slot){
                 colocat = true;
-                enEditor = true;
 
                 if(Slot){
                     Editor.TreureSlot(Slot);
