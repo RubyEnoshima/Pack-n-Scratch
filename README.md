@@ -5,6 +5,6 @@ Els jugadors rebran un input i un output explicat per diferents personatges. Han
 
 Gràcies a la nostra mecànica de feedback, el jugador pot saber quin error concret té el codi encara que es fan servir blocs.
 
-Fet per [Rubén López](github.com/RubyEnoshima) i [Abel Navarro](github.com/AbelxRules).
+Fet per [Rubén López](https://github.com/RubyEnoshima) i [Abel Navarro](https://github.com/AbelxRules).
 
 Enllaç a [itch.io](https://rubyenoshima.itch.io/packn-scratch)
